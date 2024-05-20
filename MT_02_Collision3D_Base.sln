@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34902.65
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MT_02_Collision3D_Base", "MT_02_Collision3D_Base.vcxproj", "{015820B1-E234-4871-A605-5D51CF625AB1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{015820B1-E234-4871-A605-5D51CF625AB1}.Debug|x64.ActiveCfg = Debug|x64
+		{015820B1-E234-4871-A605-5D51CF625AB1}.Debug|x64.Build.0 = Debug|x64
+		{015820B1-E234-4871-A605-5D51CF625AB1}.Release|x64.ActiveCfg = Release|x64
+		{015820B1-E234-4871-A605-5D51CF625AB1}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {DE28EEEF-B09A-4A00-BFCC-87061201A22C}
+	EndGlobalSection
+EndGlobal
