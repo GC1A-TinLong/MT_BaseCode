@@ -53,15 +53,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		Sphere pointSphere = { point,0.01f };
 		Sphere closestPointSphere = { closestPoint,0.01f };
 
-		ImGui::Begin("Debug Window");
-		ImGui::DragFloat3("CameraTranslate", &cameraPosition.x, 0.01f);
-		ImGui::DragFloat3("CameraRotate", &cameraRotate.x, 0.01f);
-		ImGui::DragFloat3("Point", &point.x, 0.02f);
-		ImGui::DragFloat3("Segment origin", &segment.origin.x, 0.02f);
-		ImGui::DragFloat3("Segment diff", &segment.diff.x, 0.02f);
-		ImGui::InputFloat3("Project", &project.x, "%.3f", ImGuiInputTextFlags_ReadOnly);
-		ImGui::End();
-
 		///
 		/// ↑更新処理ここまで
 		///
@@ -74,6 +65,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		Novice::DrawLine(int(start.x), int(start.y), int(end.x), int(end.y), WHITE);
 		DrawSphere(pointSphere, viewProjectionMatrix, viewportMatrix, RED);
 		DrawSphere(closestPointSphere, viewProjectionMatrix, viewportMatrix, BLACK);
+
+		ImGui::Begin("Debug Window");
+		ImGui::DragFloat3("CameraTranslate", &cameraPosition.x, 0.01f);
+		ImGui::DragFloat3("CameraRotate", &cameraRotate.x, 0.01f);
+		ImGui::DragFloat3("Point", &point.x, 0.01f);
+		ImGui::DragFloat3("Segment origin", &segment.origin.x, 0.01f);
+		ImGui::DragFloat3("Segment diff", &segment.diff.x, 0.01f);
+		ImGui::InputFloat3("Project", &project.x, "%.3f", ImGuiInputTextFlags_ReadOnly);
+		ImGui::InputFloat3("pointSphere", &pointSphere.center.x, "%.3f", ImGuiInputTextFlags_ReadOnly);
+		ImGui::End();
 
 		///
 		/// ↑描画処理ここまで

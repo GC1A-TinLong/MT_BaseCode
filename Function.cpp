@@ -76,7 +76,8 @@ Vector3 Project(const Vector3& v1, const Vector3& v2)
 
 Vector3 ClosestPoint(const Vector3& point, const Segment& segment)
 {
-	return point + segment.diff;
+	Vector3 project = Project(point - segment.origin, segment.diff);
+	return segment.origin + project;
 }
 
 Matrix4x4 operator+(const Matrix4x4& m1, const Matrix4x4& m2)
@@ -365,12 +366,13 @@ void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, con
 			//World座標系でのa,b,cを求める
 
 			Vector3 a, b, c;
-			a = { sphere.radius * (cosf(lat) * cosf(lon) + sphere.center.x),sphere.radius * (sinf(lat) + sphere.center.y),
-				sphere.radius * ((cosf(lat) * sinf(lon) + sphere.center.z)) };
-			b = { sphere.radius * (cosf(lat + kLatEvery) * cosf(lon) + sphere.center.x),sphere.radius * (sinf(lat + kLatEvery) + sphere.center.y),
-				sphere.radius * (cosf(lat + kLatEvery) * sinf(lon) + sphere.center.z) };
-			c = { sphere.radius * (cosf(lat) * cosf(lon + kLonEvery) + sphere.center.x),sphere.radius * (sinf(lat) + sphere.center.y),
-				sphere.radius * (cosf(lat) * sinf(lon + kLonEvery) + sphere.center.z) };
+			a = { sphere.radius * (cosf(lat) * cosf(lon)) + sphere.center.x,sphere.radius * (sinf(lat)) + sphere.center.y,
+				sphere.radius * (cosf(lat) * sinf(lon)) + sphere.center.z };
+			b = { sphere.radius * (cosf(lat + kLatEvery) * cosf(lon)) +
+				sphere.center.x,sphere.radius * (sinf(lat + kLatEvery)) + sphere.center.y,
+				sphere.radius * (cosf(lat + kLatEvery) * sinf(lon)) + sphere.center.z };
+			c = { sphere.radius * (cosf(lat) * cosf(lon + kLonEvery)) + sphere.center.x,sphere.radius * (sinf(lat)) + sphere.center.y,
+				sphere.radius * (cosf(lat) * sinf(lon + kLonEvery)) + sphere.center.z };
 			//a,b,cをScreen座標系まで変換
 			Vector3 screenA = Transform(Transform(a, viewProjectionMatrix), viewportMatrix);
 			Vector3 screenB = Transform(Transform(b, viewProjectionMatrix), viewportMatrix);
