@@ -5,7 +5,7 @@
 const char kWindowTitle[] = "GC2A_08_チョウ_テンロウ";
 
 // Windowsアプリでのエントリーポイント(main関数)
-int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
+int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {	
 
 	// ライブラリの初期化
 	const int kWindowWidth = 1280;
