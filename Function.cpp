@@ -44,7 +44,7 @@ Vector3 operator*(float scalar, const Vector3& v)
 	return result;
 }
 
-float Dot(Vector3& v1, Vector3& v2)
+static float Dot(const Vector3& v1, const Vector3& v2)
 {
 	return (v1.x * v2.x + v1.y * v2.y + v1.z * v2.z);
 }
@@ -71,16 +71,7 @@ Vector3 Cross(const Vector3& v1, const Vector3& v2)
 
 Vector3 Project(const Vector3& v1, const Vector3& v2)
 {
-	Vector3 normalV2 = Normailize(v2);
-	return {
-		(v1.x * v2.x * normalV2.x) / Length(v2),
-		(v1.y * v2.y * normalV2.y) / Length(v2),
-		(v1.z * v2.z * normalV2.z) / Length(v2),
-
-		/*v1.x * normalV2.x * normalV2.x,
-		v1.y * normalV2.y * normalV2.y,
-		v1.z * normalV2.z * normalV2.z*/
-	};
+	return Dot(v1, Normailize(v2)) * Normailize(v2);
 }
 
 Vector3 ClosestPoint(const Vector3& point, const Segment& segment)

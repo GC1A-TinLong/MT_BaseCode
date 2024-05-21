@@ -13,24 +13,24 @@ struct Vector3 {
 void VectorScreenPrintf(int x, int y, const Vector3& vector, const char* label);
 
 //For Line
-struct Line { 
-	Vector3 origin; 
-	Vector3 diff; 
+struct Line {
+	Vector3 origin;
+	Vector3 diff;
 };
-struct Ray { 
-	Vector3 origin; 
-	Vector3 diff; 
+struct Ray {
+	Vector3 origin;
+	Vector3 diff;
 };
-struct Segment { 
-	Vector3 origin; 
-	Vector3 diff; 
+struct Segment {
+	Vector3 origin;
+	Vector3 diff;
 };
 
 Vector3 operator+(const Vector3& v1, const Vector3& v2);
 Vector3 operator-(const Vector3& v1, const Vector3& v2);
 Vector3 operator*(float scalar, const Vector3& v);
 
-float Dot(Vector3& v1, Vector3& v2);
+static float Dot(const Vector3& v1, const Vector3& v2);
 float Length(const Vector3& v);
 Vector3 Normailize(const Vector3& v);
 Vector3 Cross(const Vector3& v1, const Vector3& v2);
