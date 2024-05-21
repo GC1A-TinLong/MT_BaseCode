@@ -1,5 +1,25 @@
 ﻿#include "Function.h"
 
+void CameraControl(Vector3& cameraPosition, Vector3& cameraRotate)
+{
+	Vector2Int prevMousePos{};
+	Vector2Int currentMousePos{};
+	Novice::GetMousePosition(&prevMousePos.x, &prevMousePos.y);
+		if (Novice::IsPressMouse(0) == 1) {
+			Novice::GetMousePosition(&currentMousePos.x, &currentMousePos.y);
+			cameraPosition.x += (currentMousePos.x - prevMousePos.x);
+			cameraPosition.y += (currentMousePos.y - prevMousePos.y);
+			prevMousePos = currentMousePos;
+		}
+	}
+		if (Novice::IsPressMouse(1) == 1) {
+			Novice::GetMousePosition(&currentMousePos.x, &currentMousePos.y);
+			cameraRotate.x += (currentMousePos.x - prevMousePos.x);
+			cameraRotate.y += (currentMousePos.y - prevMousePos.y);
+			prevMousePos = currentMousePos;
+		}
+	}
+}
 void MatrixScreenPrintf(int x, int y, const Matrix4x4& matrix, const char* label)
 {
 	Novice::ScreenPrintf(x, y, "%s", label);
@@ -361,7 +381,7 @@ void DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMa
 void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color)
 {
 	const float pi = (float)std::numbers::pi;
-	const uint32_t kSubDivision = 20;//分割数
+	const uint32_t kSubDivision = 16;//分割数
 	const float kLonEvery = pi / kSubDivision;;//経度分割1つ分の角度
 	const float kLatEvery = (2 * pi) / kSubDivision;;//緯度分割1つ分の角度
 	//緯度の方向に分割 -π/2 ～ π/2
