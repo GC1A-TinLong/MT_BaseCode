@@ -1,5 +1,38 @@
 ﻿#include "Function.h"
 
+void CameraControl(char* keys, Vector3& cameraPosition, Vector3& cameraRotate) {
+	if (keys[DIK_Q]) {
+		cameraPosition.y += 0.05f;
+	}
+	if (keys[DIK_E]) {
+		cameraPosition.y -= 0.05f;
+	}
+	if (keys[DIK_A] && !keys[DIK_LSHIFT]) {
+		cameraPosition.x -= 0.05f;
+	}
+	if (keys[DIK_D] && !keys[DIK_LSHIFT]) {
+		cameraPosition.x += 0.05f;
+	}
+	if (keys[DIK_W] && !keys[DIK_LSHIFT]) {
+		cameraPosition.z += 0.05f;
+	}
+	if (keys[DIK_S] && !keys[DIK_LSHIFT]) {
+		cameraPosition.z -= 0.05f;
+	}
+	if (keys[DIK_LSHIFT] && keys[DIK_W]) {
+		cameraRotate.x -= 0.02f;
+	}
+	if (keys[DIK_LSHIFT] && keys[DIK_S]) {
+		cameraRotate.x += 0.02f;
+	}
+	if (keys[DIK_LSHIFT] && keys[DIK_A]) {
+		cameraRotate.y -= 0.02f;
+	}
+	if (keys[DIK_LSHIFT] && keys[DIK_D]) {
+		cameraRotate.y += 0.02f;
+	}
+}
+
 void MatrixScreenPrintf(int x, int y, const Matrix4x4& matrix, const char* label)
 {
 	Novice::ScreenPrintf(x, y, "%s", label);
@@ -9,6 +42,7 @@ void MatrixScreenPrintf(int x, int y, const Matrix4x4& matrix, const char* label
 		}
 	}
 }
+
 void VectorScreenPrintf(int x, int y, const Vector3& vector, const char* label) {
 	Novice::ScreenPrintf(x, y, "%0.2f", vector.x);
 	Novice::ScreenPrintf(x + kColumnWidth, y, "%0.2f", vector.y);
@@ -16,6 +50,27 @@ void VectorScreenPrintf(int x, int y, const Vector3& vector, const char* label) 
 	Novice::ScreenPrintf(x + kColumnWidth * 3, y, "%s", label);
 }
 
+Vector2Int operator-(const Vector2Int& v1, const Vector2Int& v2)
+{
+	return {
+		v1.x - v2.x,
+		v1.y - v2.y
+	};
+}
+
+float Length(const Vector2Int& v)
+{
+	return sqrtf(float(v.x * v.x + v.y * v.y));
+}
+
+Vector2 Normailize(const Vector2Int& v)
+{
+	assert(Length(v));
+	return {
+		v.x / Length(v),
+		v.y / Length(v),
+	};
+}
 
 Vector3 operator+(const Vector3& v1, const Vector3& v2)
 {
@@ -361,7 +416,7 @@ void DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMa
 void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color)
 {
 	const float pi = (float)std::numbers::pi;
-	const uint32_t kSubDivision = 20;//分割数
+	const uint32_t kSubDivision = 16;//分割数
 	const float kLonEvery = pi / kSubDivision;;//経度分割1つ分の角度
 	const float kLatEvery = (2 * pi) / kSubDivision;;//緯度分割1つ分の角度
 	//緯度の方向に分割 -π/2 ～ π/2
@@ -374,12 +429,13 @@ void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, con
 			//World座標系でのa,b,cを求める
 
 			Vector3 a, b, c;
-			a = { sphere.radius * (cosf(lat) * cosf(lon) + sphere.center.x),sphere.radius * (sinf(lat) + sphere.center.y),
-				sphere.radius * ((cosf(lat) * sinf(lon) + sphere.center.z)) };
-			b = { sphere.radius * (cosf(lat + kLatEvery) * cosf(lon) + sphere.center.x),sphere.radius * (sinf(lat + kLatEvery) + sphere.center.y),
-				sphere.radius * (cosf(lat + kLatEvery) * sinf(lon) + sphere.center.z) };
-			c = { sphere.radius * (cosf(lat) * cosf(lon + kLonEvery) + sphere.center.x),sphere.radius * (sinf(lat) + sphere.center.y),
-				sphere.radius * (cosf(lat) * sinf(lon + kLonEvery) + sphere.center.z) };
+			a = { sphere.radius * (cosf(lat) * cosf(lon)) + sphere.center.x,sphere.radius * (sinf(lat)) + sphere.center.y,
+				sphere.radius * (cosf(lat) * sinf(lon)) + sphere.center.z };
+			b = { sphere.radius * (cosf(lat + kLatEvery) * cosf(lon)) +
+				sphere.center.x,sphere.radius * (sinf(lat + kLatEvery)) + sphere.center.y,
+				sphere.radius * (cosf(lat + kLatEvery) * sinf(lon)) + sphere.center.z };
+			c = { sphere.radius * (cosf(lat) * cosf(lon + kLonEvery)) + sphere.center.x,sphere.radius * (sinf(lat)) + sphere.center.y,
+				sphere.radius * (cosf(lat) * sinf(lon + kLonEvery)) + sphere.center.z };
 			//a,b,cをScreen座標系まで変換
 			Vector3 screenA = Transform(Transform(a, viewProjectionMatrix), viewportMatrix);
 			Vector3 screenB = Transform(Transform(b, viewProjectionMatrix), viewportMatrix);
@@ -389,4 +445,13 @@ void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, con
 			Novice::DrawLine(int(screenA.x), int(screenA.y), int(screenC.x), int(screenC.y), color);
 		}
 	}
+}
+
+bool isCollideSphere(Sphere& sphere1, Sphere& sphere2)
+{
+	float distance = Length(sphere2.center - sphere1.center);
+	if (distance <= sphere1.radius + sphere2.radius) {
+		return true;
+	}
+	return false;
 }
