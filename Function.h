@@ -15,15 +15,17 @@ struct Vector2Int {
 struct Vector2 {
 	float x, y;
 };
-
 struct Vector3 {
 	float x, y, z;
 };
 
-void CameraControl(Vector3& cameraPosition, Vector3& cameraRotate);
-
-void VectorScreenPrintf(int x, int y, const Vector3& vector, const char* label);
-
+struct Matrix4x4 {
+	float m[4][4];
+};
+struct Sphere {
+	Vector3 center;
+	float radius;
+};
 // For Line
 struct Line {
 	Vector3 origin;
@@ -37,6 +39,10 @@ struct Segment {
 	Vector3 origin;
 	Vector3 diff;
 };
+
+void CameraControl(char* keys, Vector3& cameraPosition, Vector3& cameraRotate);
+
+void VectorScreenPrintf(int x, int y, const Vector3& vector, const char* label);
 
 Vector2Int operator-(const Vector2Int& v1, const Vector2Int& v2);
 float Length(const Vector2Int& v);
@@ -53,9 +59,6 @@ Vector3 Cross(const Vector3& v1, const Vector3& v2);
 Vector3 Project(const Vector3& v1, const Vector3& v2);
 Vector3 ClosestPoint(const Vector3& point, const Segment& segment);
 
-struct Matrix4x4 {
-	float m[4][4];
-};
 void MatrixScreenPrintf(int x, int y, const Matrix4x4& matrix, const char* label);
 
 Matrix4x4 operator+(const Matrix4x4& m1, const Matrix4x4& m2);
@@ -77,9 +80,5 @@ Matrix4x4 MakeViewportMatrix(float left, float top, float width, float height, f
 
 void DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix);
 
-struct Sphere {
-	Vector3 center;
-	float radius;
-};
 void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
 bool isCollideSphere(Sphere& sphere1, Sphere& sphere2);
