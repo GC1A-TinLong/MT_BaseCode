@@ -52,6 +52,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		Sphere pointSphere = { point,0.01f };
 		Sphere closestPointSphere = { closestPoint,0.01f };
+		//test
 
 		///
 		/// ↑更新処理ここまで
