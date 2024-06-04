@@ -1,25 +1,33 @@
 ﻿#include "Function.h"
 
-void CameraControl(Vector3& cameraPosition, Vector3& cameraRotate)
-{
-	Vector2Int prevMousePos{};
-	Vector2Int currentMousePos{};
-	Novice::GetMousePosition(&prevMousePos.x, &prevMousePos.y);
-		if (Novice::IsPressMouse(0) == 1) {
-			Novice::GetMousePosition(&currentMousePos.x, &currentMousePos.y);
-			cameraPosition.x += (currentMousePos.x - prevMousePos.x);
-			cameraPosition.y += (currentMousePos.y - prevMousePos.y);
-			prevMousePos = currentMousePos;
-		}
-	}
-		if (Novice::IsPressMouse(1) == 1) {
-			Novice::GetMousePosition(&currentMousePos.x, &currentMousePos.y);
-			cameraRotate.x += (currentMousePos.x - prevMousePos.x);
-			cameraRotate.y += (currentMousePos.y - prevMousePos.y);
-			prevMousePos = currentMousePos;
-		}
-	}
-}
+//void CameraControl(Vector3& cameraPosition, Vector3& cameraRotate)
+//{
+//	Vector2Int prevMousePos{};
+//	Vector2Int currentMousePos{};
+//	float velocity = 0.01f;
+//	if (!Novice::IsPressMouse(0) && !Novice::IsPressMouse(1)) {
+//		Novice::GetMousePosition(&prevMousePos.x, &prevMousePos.y);
+//	}
+//	if (Novice::IsPressMouse(0)) {
+//		Novice::GetMousePosition(&currentMousePos.x, &currentMousePos.y);
+//		Vector2Int length = currentMousePos - prevMousePos;
+//		Vector2 direction = Normailize(length);
+//		cameraPosition.x -= direction.x / 100.0f;
+//		cameraPosition.y -= direction.y / 100.0f;
+//		prevMousePos = currentMousePos;
+//	}
+//	if (Novice::IsPressMouse(1)) {
+//		Novice::GetMousePosition(&currentMousePos.x, &currentMousePos.y);
+//		Vector2Int length = currentMousePos - prevMousePos;
+//		Vector2 direction = Normailize(length);
+//		/*cameraRotate.x -= ((currentMousePos.x - prevMousePos.x) / 10000.0f) * (float)direction.x;
+//		cameraRotate.y -= ((currentMousePos.y - prevMousePos.y) / 10000.0f) * (float)direction.y;*/
+//		cameraRotate.x += velocity * (float)direction.x;
+//		cameraRotate.y += velocity * (float)direction.y;
+//		prevMousePos = currentMousePos;
+//	}
+//}
+
 void MatrixScreenPrintf(int x, int y, const Matrix4x4& matrix, const char* label)
 {
 	Novice::ScreenPrintf(x, y, "%s", label);
@@ -36,6 +44,28 @@ void VectorScreenPrintf(int x, int y, const Vector3& vector, const char* label) 
 	Novice::ScreenPrintf(x + kColumnWidth * 3, y, "%s", label);
 }
 
+
+Vector2Int operator-(const Vector2Int& v1, const Vector2Int& v2)
+{
+	return {
+		v1.x - v2.x,
+		v1.y - v2.y
+	};
+}
+
+float Length(const Vector2Int& v)
+{
+	return sqrtf(float(v.x * v.x + v.y * v.y));
+}
+
+Vector2 Normailize(const Vector2Int& v)
+{
+	assert(Length(v));
+	return {
+		v.x / Length(v),
+		v.y / Length(v),
+	};
+}
 
 Vector3 operator+(const Vector3& v1, const Vector3& v2)
 {
@@ -394,12 +424,13 @@ void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, con
 			//World座標系でのa,b,cを求める
 
 			Vector3 a, b, c;
-			a = { sphere.radius * (cosf(lat) * cosf(lon) + sphere.center.x),sphere.radius * (sinf(lat) + sphere.center.y),
-				sphere.radius * ((cosf(lat) * sinf(lon) + sphere.center.z)) };
-			b = { sphere.radius * (cosf(lat + kLatEvery) * cosf(lon) + sphere.center.x),sphere.radius * (sinf(lat + kLatEvery) + sphere.center.y),
-				sphere.radius * (cosf(lat + kLatEvery) * sinf(lon) + sphere.center.z) };
-			c = { sphere.radius * (cosf(lat) * cosf(lon + kLonEvery) + sphere.center.x),sphere.radius * (sinf(lat) + sphere.center.y),
-				sphere.radius * (cosf(lat) * sinf(lon + kLonEvery) + sphere.center.z) };
+			a = { sphere.radius * (cosf(lat) * cosf(lon)) + sphere.center.x,sphere.radius * (sinf(lat)) + sphere.center.y,
+				sphere.radius * (cosf(lat) * sinf(lon)) + sphere.center.z };
+			b = { sphere.radius * (cosf(lat + kLatEvery) * cosf(lon)) +
+				sphere.center.x,sphere.radius * (sinf(lat + kLatEvery)) + sphere.center.y,
+				sphere.radius * (cosf(lat + kLatEvery) * sinf(lon)) + sphere.center.z };
+			c = { sphere.radius * (cosf(lat) * cosf(lon + kLonEvery)) + sphere.center.x,sphere.radius * (sinf(lat)) + sphere.center.y,
+				sphere.radius * (cosf(lat) * sinf(lon + kLonEvery)) + sphere.center.z };
 			//a,b,cをScreen座標系まで変換
 			Vector3 screenA = Transform(Transform(a, viewProjectionMatrix), viewportMatrix);
 			Vector3 screenB = Transform(Transform(b, viewProjectionMatrix), viewportMatrix);
@@ -409,4 +440,13 @@ void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, con
 			Novice::DrawLine(int(screenA.x), int(screenA.y), int(screenC.x), int(screenC.y), color);
 		}
 	}
+}
+
+bool isCollideSphere(Sphere& sphere1, Sphere& sphere2)
+{
+	float distance = Length(sphere2.center - sphere1.center);
+	if (distance <= sphere1.radius + sphere2.radius) {
+		return true;
+	}
+	return false;
 }

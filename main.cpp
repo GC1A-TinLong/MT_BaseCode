@@ -19,6 +19,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	Sphere sphere1{ {1.0f,0,0.5f},0.5f };
 	Sphere sphere2{ {0,0,-0.5f},0.8f };
+	unsigned int color1 = WHITE;
+	unsigned int color2 = WHITE;
 
 	// キー入力結果を受け取る箱
 	char keys[256] = { 0 };
@@ -45,15 +47,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		Matrix4x4 worldViewProjectionMatrix = worldMatrix * viewMatrix * projectionMatrix;
 		Matrix4x4 viewportMatrix = MakeViewportMatrix(0, 0, float(kWindowWidth), float(kWindowHeight), 0.0f, 1.0f);
 
-		CameraControl(cameraPosition, cameraRotate);
-		ImGui::Begin("Debug Window");
-		ImGui::DragFloat3("CameraTranslate", &cameraPosition.x, 0.01f);
-		ImGui::DragFloat3("CameraRotate", &cameraRotate.x, 0.01f);
-		ImGui::DragFloat3("sphere1.center", &sphere1.center.x, 0.01f);
-		ImGui::DragFloat("sphere1.radius", &sphere1.radius, 0.01f);
-		ImGui::DragFloat3("sphere2.center", &sphere2.center.x, 0.01f);
-		ImGui::DragFloat("sphere2.radius", &sphere2.radius, 0.01f);
-		ImGui::End();
+		if (isCollideSphere(sphere1,sphere2)) {
+			color1 = RED;
+		}
+		else {
+			color1 = WHITE;
+		}
 
 		///
 		/// ↑更新処理ここまで
@@ -64,8 +63,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		///
 
 		DrawGrid(viewProjectionMatrix, viewportMatrix);
-		DrawSphere(sphere1, viewProjectionMatrix, viewportMatrix, WHITE);
-		DrawSphere(sphere2, viewProjectionMatrix, viewportMatrix, WHITE);
+		DrawSphere(sphere1, viewProjectionMatrix, viewportMatrix, color1);
+		DrawSphere(sphere2, viewProjectionMatrix, viewportMatrix, color2);
+
+		ImGui::Begin("Debug Window");
+		ImGui::DragFloat3("CameraTranslate", &cameraPosition.x, 0.01f);
+		ImGui::DragFloat3("CameraRotate", &cameraRotate.x, 0.01f);
+		ImGui::DragFloat3("sphere1.center", &sphere1.center.x, 0.01f);
+		ImGui::DragFloat("sphere1.radius", &sphere1.radius, 0.01f);
+		ImGui::DragFloat3("sphere2.center", &sphere2.center.x, 0.01f);
+		ImGui::DragFloat("sphere2.radius", &sphere2.radius, 0.01f);
+		ImGui::End();
 
 		///
 		/// ↑描画処理ここまで
