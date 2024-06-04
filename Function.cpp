@@ -1,32 +1,37 @@
 ﻿#include "Function.h"
 
-//void CameraControl(Vector3& cameraPosition, Vector3& cameraRotate)
-//{
-//	Vector2Int prevMousePos{};
-//	Vector2Int currentMousePos{};
-//	float velocity = 0.01f;
-//	if (!Novice::IsPressMouse(0) && !Novice::IsPressMouse(1)) {
-//		Novice::GetMousePosition(&prevMousePos.x, &prevMousePos.y);
-//	}
-//	if (Novice::IsPressMouse(0)) {
-//		Novice::GetMousePosition(&currentMousePos.x, &currentMousePos.y);
-//		Vector2Int length = currentMousePos - prevMousePos;
-//		Vector2 direction = Normailize(length);
-//		cameraPosition.x -= direction.x / 100.0f;
-//		cameraPosition.y -= direction.y / 100.0f;
-//		prevMousePos = currentMousePos;
-//	}
-//	if (Novice::IsPressMouse(1)) {
-//		Novice::GetMousePosition(&currentMousePos.x, &currentMousePos.y);
-//		Vector2Int length = currentMousePos - prevMousePos;
-//		Vector2 direction = Normailize(length);
-//		/*cameraRotate.x -= ((currentMousePos.x - prevMousePos.x) / 10000.0f) * (float)direction.x;
-//		cameraRotate.y -= ((currentMousePos.y - prevMousePos.y) / 10000.0f) * (float)direction.y;*/
-//		cameraRotate.x += velocity * (float)direction.x;
-//		cameraRotate.y += velocity * (float)direction.y;
-//		prevMousePos = currentMousePos;
-//	}
-//}
+void CameraControl(char* keys, Vector3& cameraPosition, Vector3& cameraRotate) {
+	if (keys[DIK_Q]) {
+		cameraPosition.y += 0.05f;
+	}
+	if (keys[DIK_E]) {
+		cameraPosition.y -= 0.05f;
+	}
+	if (keys[DIK_A] && !keys[DIK_LSHIFT]) {
+		cameraPosition.x -= 0.05f;
+	}
+	if (keys[DIK_D] && !keys[DIK_LSHIFT]) {
+		cameraPosition.x += 0.05f;
+	}
+	if (keys[DIK_W] && !keys[DIK_LSHIFT]) {
+		cameraPosition.z += 0.05f;
+	}
+	if (keys[DIK_S] && !keys[DIK_LSHIFT]) {
+		cameraPosition.z -= 0.05f;
+	}
+	if (keys[DIK_LSHIFT] && keys[DIK_W]) {
+		cameraRotate.x -= 0.02f;
+	}
+	if (keys[DIK_LSHIFT] && keys[DIK_S]) {
+		cameraRotate.x += 0.02f;
+	}
+	if (keys[DIK_LSHIFT] && keys[DIK_A]) {
+		cameraRotate.y -= 0.02f;
+	}
+	if (keys[DIK_LSHIFT] && keys[DIK_D]) {
+		cameraRotate.y += 0.02f;
+	}
+}
 
 void MatrixScreenPrintf(int x, int y, const Matrix4x4& matrix, const char* label)
 {

@@ -20,7 +20,7 @@ struct Vector3 {
 	float x, y, z;
 };
 
-//void CameraControl(Vector3& cameraPosition, Vector3& cameraRotate);
+void CameraControl(Vector3& cameraPosition, Vector3& cameraRotate);
 
 void VectorScreenPrintf(int x, int y, const Vector3& vector, const char* label);
 
