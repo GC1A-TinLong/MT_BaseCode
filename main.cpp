@@ -17,6 +17,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Vector3 cameraRotate{ 0.26f,0,0 };
 	Vector3 cameraPosition{ 0.0f,1.9f,-6.49f };
 
+	Vector3 points[3]{};
+	points[0] = { 0.0f,1.0f,-1.0f };
+	points[1] = { 0.5f,1.0f,1.0f };
+	points[2] = { -0.5f,1.0f,1.0f };
+	Vector3 v1 = points[1] - points[0];
+	Vector3 v2 = points[2] - points[1];
+	Vector3 normal = Normalize(Cross(v1, v2));
+
+	Plane plane{
+		normal,
+		Dot(points[0],normal)
+	};
+
 
 	// キー入力結果を受け取る箱
 	char keys[256] = { 0 };
@@ -35,6 +48,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// ↓更新処理ここから
 		///
 
+		CameraControl(keys, cameraPosition, cameraRotate);
+
 		Matrix4x4 worldMatrix = MakeAffineMatrix({ 1.0f,1.0f,1.0f }, rotate, translate);
 		Matrix4x4 cameraMatrix = MakeAffineMatrix({ 1.0f,1.0f,1.0f }, cameraRotate, cameraPosition);
 		Matrix4x4 viewMatrix = Inverse(cameraMatrix);
@@ -50,6 +65,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		///
 		/// ↓描画処理ここから
 		///
+
+		DrawPlane(plane, viewProjectionMatrix, viewportMatrix, BLUE);
+
+		DrawGrid(viewProjectionMatrix, viewportMatrix);
+
+		ImGui::Begin("Debug Window");
+		ImGui::DragFloat3("CameraTranslate", &cameraPosition.x, 0.01f);
+		ImGui::DragFloat3("CameraRotate", &cameraRotate.x, 0.01f);
+		ImGui::DragFloat3("Plane.normal", &plane.normal.x, 0.01f);
+		ImGui::End();
+		plane.normal = Normalize(plane.normal);
 
 		///
 		/// ↑描画処理ここまで

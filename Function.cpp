@@ -63,7 +63,7 @@ float Length(const Vector2Int& v)
 	return sqrtf(float(v.x * v.x + v.y * v.y));
 }
 
-Vector2 Normailize(const Vector2Int& v)
+Vector2 Normalize(const Vector2Int& v)
 {
 	assert(Length(v));
 	return {
@@ -109,7 +109,7 @@ float Length(const Vector3& v)
 	return sqrtf(v.x * v.x + v.y * v.y + v.z * v.z);
 }
 
-Vector3 Normailize(const Vector3& v)
+Vector3 Normalize(const Vector3& v)
 {
 	assert(Length(v));
 	return {
@@ -126,15 +126,11 @@ Vector3 Cross(const Vector3& v1, const Vector3& v2)
 
 Vector3 Project(const Vector3& v1, const Vector3& v2)
 {
-	Vector3 normalV2 = Normailize(v2);
+	Vector3 normalV2 = Normalize(v2);
 	return {
 		(v1.x * v2.x * normalV2.x) / Length(v2),
 		(v1.y * v2.y * normalV2.y) / Length(v2),
 		(v1.z * v2.z * normalV2.z) / Length(v2),
-
-		/*v1.x * normalV2.x * normalV2.x,
-		v1.y * normalV2.y * normalV2.y,
-		v1.z * normalV2.z * normalV2.z*/
 	};
 }
 
@@ -447,11 +443,41 @@ void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, con
 	}
 }
 
-bool isCollideSphere(Sphere& sphere1, Sphere& sphere2)
+bool isCollideSphere(const Sphere& sphere1, const Sphere& sphere2)
 {
 	float distance = Length(sphere2.center - sphere1.center);
 	if (distance <= sphere1.radius + sphere2.radius) {
 		return true;
 	}
 	return false;
+}
+
+Vector3 Perpendicular(const Vector3& vector)
+{
+	if (vector.x != 0.0f || vector.y != 0.0f) {
+		return { -vector.y,vector.x,0.0f };
+	}
+	return { 0.0f,-vector.z,vector.y };
+}
+
+void DrawPlane(const Plane& plane, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color)
+{
+	Vector3 center = plane.distance * plane.normal;
+	Vector3 perpendiculars[4]{};
+	perpendiculars[0] = Normalize(Perpendicular(plane.normal));
+	perpendiculars[1] = { -perpendiculars[0].x,-perpendiculars[0].y,-perpendiculars[0].z };
+	perpendiculars[2] = Cross(plane.normal, perpendiculars[0]);
+	perpendiculars[3] = { -perpendiculars[2].x,-perpendiculars[2].y,-perpendiculars[2].z };
+
+	Vector3 points[4]{};
+	for (int32_t index = 0; index < 4; index++) {
+		Vector3 extend = 2.0f * perpendiculars[index];
+		Vector3 point = center + extend;
+		points[index] = Transform(Transform(point, viewProjectionMatrix), viewportMatrix);
+	}
+
+	for (int32_t index = 0; index < 3; index++) {
+		Novice::DrawLine((int)points[index].x, (int)points[index].y, (int)points[index + 1].x, (int)points[index + 1].y, color);
+	}
+	Novice::DrawLine((int)points[3].x, (int)points[3].y, (int)points[0].x, (int)points[0].y, color);
 }
