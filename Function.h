@@ -46,15 +46,15 @@ void VectorScreenPrintf(int x, int y, const Vector3& vector, const char* label);
 
 Vector2Int operator-(const Vector2Int& v1, const Vector2Int& v2);
 float Length(const Vector2Int& v);
-Vector2 Normailize(const Vector2Int& v);
+Vector2 Normalize(const Vector2Int& v);
 
 Vector3 operator+(const Vector3& v1, const Vector3& v2);
 Vector3 operator-(const Vector3& v1, const Vector3& v2);
 Vector3 operator*(float scalar, const Vector3& v);
 
-float Dot(Vector3& v1, Vector3& v2);
+float Dot(const Vector3& v1, const Vector3& v2);
 float Length(const Vector3& v);
-Vector3 Normailize(const Vector3& v);
+Vector3 Normalize(const Vector3& v);
 Vector3 Cross(const Vector3& v1, const Vector3& v2);
 Vector3 Project(const Vector3& v1, const Vector3& v2);
 Vector3 ClosestPoint(const Vector3& point, const Segment& segment);

@@ -63,7 +63,7 @@ float Length(const Vector2Int& v)
 	return sqrtf(float(v.x * v.x + v.y * v.y));
 }
 
-Vector2 Normailize(const Vector2Int& v)
+Vector2 Normalize(const Vector2Int& v)
 {
 	assert(Length(v));
 	return {
@@ -99,7 +99,7 @@ Vector3 operator*(float scalar, const Vector3& v)
 	return result;
 }
 
-float Dot(Vector3& v1, Vector3& v2)
+float Dot(const Vector3& v1, const Vector3& v2)
 {
 	return (v1.x * v2.x + v1.y * v2.y + v1.z * v2.z);
 }
@@ -109,7 +109,7 @@ float Length(const Vector3& v)
 	return sqrtf(v.x * v.x + v.y * v.y + v.z * v.z);
 }
 
-Vector3 Normailize(const Vector3& v)
+Vector3 Normalize(const Vector3& v)
 {
 	assert(Length(v));
 	return {
@@ -126,21 +126,13 @@ Vector3 Cross(const Vector3& v1, const Vector3& v2)
 
 Vector3 Project(const Vector3& v1, const Vector3& v2)
 {
-	Vector3 normalV2 = Normailize(v2);
-	return {
-		(v1.x * v2.x * normalV2.x) / Length(v2),
-		(v1.y * v2.y * normalV2.y) / Length(v2),
-		(v1.z * v2.z * normalV2.z) / Length(v2),
-
-		/*v1.x * normalV2.x * normalV2.x,
-		v1.y * normalV2.y * normalV2.y,
-		v1.z * normalV2.z * normalV2.z*/
-	};
+	return Dot(v1, Normalize(v2)) * Normalize(v2);
 }
 
 Vector3 ClosestPoint(const Vector3& point, const Segment& segment)
 {
-	return point + segment.diff;
+	Vector3 project = Project(point - segment.origin, segment.diff);
+	return segment.origin + project;
 }
 
 Matrix4x4 operator+(const Matrix4x4& m1, const Matrix4x4& m2)
