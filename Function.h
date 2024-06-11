@@ -5,6 +5,7 @@
 #include <cmath>
 #include <math.h>
 #include <iostream>
+#include <imgui.h>
 
 static const int kRowHeight = 20;
 static const int kColumnWidth = 60;
@@ -57,7 +58,7 @@ Vector3 operator+(const Vector3& v1, const Vector3& v2);
 Vector3 operator-(const Vector3& v1, const Vector3& v2);
 Vector3 operator*(float scalar, const Vector3& v);
 
-float Dot(Vector3& v1, Vector3& v2);
+float Dot(const Vector3& v1, const Vector3& v2);
 float Length(const Vector3& v);
 Vector3 Normalize(const Vector3& v);
 Vector3 Cross(const Vector3& v1, const Vector3& v2);
@@ -89,4 +90,4 @@ void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, con
 bool isCollideSphere(const Sphere& sphere1, const Sphere& sphere2);
 Vector3 Perpendicular(const Vector3& vector);
 void DrawPlane(const Plane& plane, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
-//bool isCollideSpherePlane(const Sphere& sphere, const Plane& plane);
+bool isCollideSpherePlane(const Sphere& sphere, const Plane& plane);

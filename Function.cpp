@@ -99,7 +99,7 @@ Vector3 operator*(float scalar, const Vector3& v)
 	return result;
 }
 
-float Dot(Vector3& v1, Vector3& v2)
+float Dot(const Vector3& v1, const Vector3& v2)
 {
 	return (v1.x * v2.x + v1.y * v2.y + v1.z * v2.z);
 }
@@ -476,8 +476,17 @@ void DrawPlane(const Plane& plane, const Matrix4x4& viewProjectionMatrix, const 
 		points[index] = Transform(Transform(point, viewProjectionMatrix), viewportMatrix);
 	}
 
-	for (int32_t index = 0; index < 3; index++) {
-		Novice::DrawLine((int)points[index].x, (int)points[index].y, (int)points[index + 1].x, (int)points[index + 1].y, color);
+	Novice::DrawLine((int)points[0].x, (int)points[0].y, (int)points[2].x, (int)points[2].y, color);
+	Novice::DrawLine((int)points[0].x, (int)points[0].y, (int)points[3].x, (int)points[3].y, color);
+	Novice::DrawLine((int)points[1].x, (int)points[1].y, (int)points[2].x, (int)points[2].y, color);
+	Novice::DrawLine((int)points[1].x, (int)points[1].y, (int)points[3].x, (int)points[3].y, color);
+}
+
+bool isCollideSpherePlane(const Sphere& sphere, const Plane& plane)
+{
+	float distance = (Dot(plane.normal, sphere.center) - plane.distance);
+	if (fabsf(distance) - sphere.radius <= 0) {
+		return true;
 	}
-	Novice::DrawLine((int)points[3].x, (int)points[3].y, (int)points[0].x, (int)points[0].y, color);
+	return false;
 }

@@ -30,6 +30,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		Dot(points[0],normal)
 	};
 
+	Sphere sphere{
+		{0,0,0},
+		1.0f
+	};
+	unsigned int color = WHITE;
+
 
 	// キー入力結果を受け取る箱
 	char keys[256] = { 0 };
@@ -58,6 +64,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		Matrix4x4 worldViewProjectionMatrix = worldMatrix * viewMatrix * projectionMatrix;
 		Matrix4x4 viewportMatrix = MakeViewportMatrix(0, 0, float(kWindowWidth), float(kWindowHeight), 0.0f, 1.0f);
 
+		if (isCollideSpherePlane(sphere, plane)) {
+			color = RED;
+		}
+		else {
+			color = WHITE;
+		}
+
+
 		///
 		/// ↑更新処理ここまで
 		///
@@ -69,11 +83,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		DrawPlane(plane, viewProjectionMatrix, viewportMatrix, BLUE);
 
 		DrawGrid(viewProjectionMatrix, viewportMatrix);
+		DrawSphere(sphere, viewProjectionMatrix, viewportMatrix, color);
 
 		ImGui::Begin("Debug Window");
 		ImGui::DragFloat3("CameraTranslate", &cameraPosition.x, 0.01f);
 		ImGui::DragFloat3("CameraRotate", &cameraRotate.x, 0.01f);
 		ImGui::DragFloat3("Plane.normal", &plane.normal.x, 0.01f);
+		ImGui::DragFloat3("Sphere.center", &sphere.center.x, 0.01f);
+		ImGui::DragFloat("Sphere.radius", &sphere.radius, 0.01f);
 		ImGui::End();
 		plane.normal = Normalize(plane.normal);
 
