@@ -500,7 +500,7 @@ bool IsCollideLinePlane(const Segment& segment, const Plane& plane)
 
 	Vector3 vector = segment.origin - segment.diff;
 	float length = Length(vector);
-	enum LineType { Line, Ray, Segment };
+	//enum LineType { Line, Ray, Segment };
 	//LineType lineType = Line;
 
 	ImGui::Begin("Debug Window");
