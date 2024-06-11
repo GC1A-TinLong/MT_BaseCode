@@ -5,6 +5,7 @@
 #include <cmath>
 #include <math.h>
 #include <iostream>
+#include <imgui.h>
 
 static const int kRowHeight = 20;
 static const int kColumnWidth = 60;

@@ -1,6 +1,5 @@
 #include <Novice.h>
 #include "Function.h"
-#include <imgui.h>
 
 const char kWindowTitle[] = "GC2A_08_チョウ_テンロウ";
 
@@ -17,6 +16,18 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Vector3 cameraRotate{ 0.26f,0,0 };
 	Vector3 cameraPosition{ 0.0f,1.9f,-6.49f };
 
+	Vector3 points[3]{};
+	points[0] = { 0.0f,1.0f,-1.0f };
+	points[1] = { 0.5f,1.0f,1.0f };
+	points[2] = { -0.5f,1.0f,1.0f };
+	Vector3 v1 = points[1] - points[0];
+	Vector3 v2 = points[2] - points[1];
+	Vector3 normal = Normalize(Cross(v1, v2));
+
+	Plane plane{
+		normal,
+		Dot(points[0],normal)
+	};
 
 	// キー入力結果を受け取る箱
 	char keys[256] = { 0 };
