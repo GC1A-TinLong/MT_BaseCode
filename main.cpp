@@ -13,8 +13,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	Vector3 rotate{};
 	Vector3 translate{ 0,0,0 };
-	Vector3 cameraRotate{ 0.26f,0,0 };
-	Vector3 cameraPosition{ 0.0f,1.9f,-6.49f };
+	Vector3 cameraRotate{ 0.0f,0,0 };
+	Vector3 cameraPosition{ 0.0f,0.5f,-9.49f };
 
 	Vector3 points[3]{};
 	points[0] = { 0.0f,1.0f,-1.0f };
@@ -28,6 +28,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		normal,
 		Dot(points[0],normal)
 	};
+
+	Segment segment = { {-1.0f,-1.0f,0.0f},{1.0f,2.0f,2.0f} };
+	unsigned int segmentColor = WHITE;
 
 	// キー入力結果を受け取る箱
 	char keys[256] = { 0 };
@@ -56,6 +59,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		CameraControl(keys, cameraPosition, cameraRotate);
 
+		if (IsCollideLinePlane(segment, plane)) {
+			segmentColor = RED;
+		}
+		else {
+			segmentColor = WHITE;
+		}
+
 		///
 		/// ↑更新処理ここまで
 		///
@@ -66,10 +76,21 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		DrawGrid(viewProjectionMatrix, viewportMatrix);
 
+		DrawPlane(plane, viewProjectionMatrix, viewportMatrix, WHITE);
+
+		Vector3 start = Transform(Transform(segment.origin, viewProjectionMatrix), viewportMatrix);
+		Vector3 end = Transform(Transform(segment.origin + segment.diff, viewProjectionMatrix), viewportMatrix);
+		Novice::DrawLine(int(start.x), int(start.y), int(end.x), int(end.y), segmentColor);
+
 		ImGui::Begin("Debug Window");
 		ImGui::DragFloat3("CameraTranslate", &cameraPosition.x, 0.01f);
 		ImGui::DragFloat3("CameraRotate", &cameraRotate.x, 0.01f);
+		ImGui::DragFloat3("segment.origin", &segment.origin.x, 0.01f);
+		ImGui::DragFloat3("segment.diff", &segment.diff.x, 0.01f);
+		ImGui::DragFloat3("plane.normal", &plane.normal.x, 0.01f);
+		ImGui::DragFloat("plane.distance", &plane.distance, 0.01f);
 		ImGui::End();
+		plane.normal = Normalize(plane.normal);
 
 		///
 		/// ↑描画処理ここまで

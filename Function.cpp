@@ -126,13 +126,17 @@ Vector3 Cross(const Vector3& v1, const Vector3& v2)
 
 Vector3 Project(const Vector3& v1, const Vector3& v2)
 {
-	return Dot(v1, Normalize(v2)) * Normalize(v2);
+	Vector3 normalV2 = Normalize(v2);
+	return {
+		(v1.x * v2.x * normalV2.x) / Length(v2),
+		(v1.y * v2.y * normalV2.y) / Length(v2),
+		(v1.z * v2.z * normalV2.z) / Length(v2),
+	};
 }
 
 Vector3 ClosestPoint(const Vector3& point, const Segment& segment)
 {
-	Vector3 project = Project(point - segment.origin, segment.diff);
-	return segment.origin + project;
+	return point + segment.diff;
 }
 
 Matrix4x4 operator+(const Matrix4x4& m1, const Matrix4x4& m2)
@@ -439,11 +443,73 @@ void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, con
 	}
 }
 
-bool isCollideSphere(Sphere& sphere1, Sphere& sphere2)
+bool IsCollideSphere(const Sphere& sphere1, const Sphere& sphere2)
 {
 	float distance = Length(sphere2.center - sphere1.center);
 	if (distance <= sphere1.radius + sphere2.radius) {
 		return true;
 	}
+	return false;
+}
+
+Vector3 Perpendicular(const Vector3& vector)
+{
+	if (vector.x != 0.0f || vector.y != 0.0f) {
+		return { -vector.y,vector.x,0.0f };
+	}
+	return { 0.0f,-vector.z,vector.y };
+}
+
+void DrawPlane(const Plane& plane, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color)
+{
+	Vector3 center = plane.distance * plane.normal;
+	Vector3 perpendiculars[4]{};
+	perpendiculars[0] = Normalize(Perpendicular(plane.normal));
+	perpendiculars[1] = { -perpendiculars[0].x,-perpendiculars[0].y,-perpendiculars[0].z };
+	perpendiculars[2] = Cross(plane.normal, perpendiculars[0]);
+	perpendiculars[3] = { -perpendiculars[2].x,-perpendiculars[2].y,-perpendiculars[2].z };
+
+	Vector3 points[4]{};
+	for (int32_t index = 0; index < 4; index++) {
+		Vector3 extend = 2.0f * perpendiculars[index];
+		Vector3 point = center + extend;
+		points[index] = Transform(Transform(point, viewProjectionMatrix), viewportMatrix);
+	}
+
+	Novice::DrawLine((int)points[0].x, (int)points[0].y, (int)points[2].x, (int)points[2].y, color);
+	Novice::DrawLine((int)points[0].x, (int)points[0].y, (int)points[3].x, (int)points[3].y, color);
+	Novice::DrawLine((int)points[1].x, (int)points[1].y, (int)points[2].x, (int)points[2].y, color);
+	Novice::DrawLine((int)points[1].x, (int)points[1].y, (int)points[3].x, (int)points[3].y, color);
+}
+
+bool IsCollideSpherePlane(const Sphere& sphere, const Plane& plane)
+{
+	float distance = (Dot(plane.normal, sphere.center) - plane.distance);
+	if (fabsf(distance) - sphere.radius <= 0) {
+		return true;
+	}
+	return false;
+}
+
+bool IsCollideLinePlane(const Segment& segment, const Plane& plane)
+{
+	float dot = Dot(plane.normal, segment.diff);
+	if (dot == 0.0f) { return false; }	// when perpendicular -> never colliding
+
+	float t = (plane.distance - Dot(segment.origin, plane.normal)) / dot;
+
+	Vector3 vector = segment.origin - segment.diff;
+	float length = Length(vector);
+	enum LineType { Line, Ray, Segment };
+	LineType lineType = Line;
+
+	if (length >= 0 && length <= 1.0f) { lineType = Segment; }
+	else if (length >= 0) { lineType = Ray; }
+	else { lineType = Line; }
+
+	if (lineType == Line) { return true; }
+	else if (t >= 0 && lineType == Ray) { return true; }
+	else if (t >= 0 && t <= 1.0f && lineType == Segment) { return true; }
+
 	return false;
 }
