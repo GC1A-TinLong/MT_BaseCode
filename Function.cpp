@@ -497,25 +497,6 @@ bool IsCollideLinePlane(const Segment& segment, const Plane& plane)
 	if (dot == 0.0f) { return false; }	// when perpendicular -> never colliding
 
 	float t = (plane.distance - Dot(segment.origin, plane.normal)) / dot;
-
-	Vector3 vector = segment.origin - segment.diff;
-	float length = Length(vector);
-	//enum LineType { Line, Ray, Segment };
-	//LineType lineType = Line;
-
-	ImGui::Begin("Debug Window");
-	ImGui::InputFloat("length", &length, 0.3f , ImGuiInputTextFlags_ReadOnly);
-	ImGui::InputFloat("t", &t, 0.3f , ImGuiInputTextFlags_ReadOnly);
-	ImGui::End();
-
-	/*if (length >= 0 && length <= 1.0f) { lineType = Segment; }
-	else if (length >= 0) { lineType = Ray; }
-	else { lineType = Line; }
-
-	if (lineType == Line) { return false; }
-	else if (t >= 0 && lineType == Ray) { return true; }
-	else if (t >= 0 && t <= 1.0f && lineType == Segment) { return true; }*/
-
 	if (t >= 0 && t <= 1.0f) { return true; }
 
 	return false;
