@@ -87,7 +87,8 @@ Matrix4x4 MakeViewportMatrix(float left, float top, float width, float height, f
 void DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix);
 
 void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
-bool isCollideSphere(const Sphere& sphere1, const Sphere& sphere2);
+bool IsCollideSphere(const Sphere& sphere1, const Sphere& sphere2);
 Vector3 Perpendicular(const Vector3& vector);
 void DrawPlane(const Plane& plane, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
-bool isCollideSpherePlane(const Sphere& sphere, const Plane& plane);
+bool IsCollideSpherePlane(const Sphere& sphere, const Plane& plane);
+bool IsCollideLinePlane(const Segment& segment, const Plane& plane);

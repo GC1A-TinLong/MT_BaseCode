@@ -2,10 +2,10 @@
 
 void CameraControl(char* keys, Vector3& cameraPosition, Vector3& cameraRotate) {
 	if (keys[DIK_Q]) {
-		cameraPosition.y += 0.05f;
+		cameraPosition.y += 0.02f;
 	}
 	if (keys[DIK_E]) {
-		cameraPosition.y -= 0.05f;
+		cameraPosition.y -= 0.02f;
 	}
 	if (keys[DIK_A] && !keys[DIK_LSHIFT]) {
 		cameraPosition.x -= 0.05f;
@@ -443,7 +443,7 @@ void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, con
 	}
 }
 
-bool isCollideSphere(const Sphere& sphere1, const Sphere& sphere2)
+bool IsCollideSphere(const Sphere& sphere1, const Sphere& sphere2)
 {
 	float distance = Length(sphere2.center - sphere1.center);
 	if (distance <= sphere1.radius + sphere2.radius) {
@@ -482,11 +482,22 @@ void DrawPlane(const Plane& plane, const Matrix4x4& viewProjectionMatrix, const 
 	Novice::DrawLine((int)points[1].x, (int)points[1].y, (int)points[3].x, (int)points[3].y, color);
 }
 
-bool isCollideSpherePlane(const Sphere& sphere, const Plane& plane)
+bool IsCollideSpherePlane(const Sphere& sphere, const Plane& plane)
 {
 	float distance = (Dot(plane.normal, sphere.center) - plane.distance);
 	if (fabsf(distance) - sphere.radius <= 0) {
 		return true;
 	}
+	return false;
+}
+
+bool IsCollideLinePlane(const Segment& segment, const Plane& plane)
+{
+	float dot = Dot(plane.normal, segment.diff);
+	if (dot == 0.0f) { return false; }	// when perpendicular -> never colliding
+
+	float t = (plane.distance - Dot(segment.origin, plane.normal)) / dot;
+	if (t >= 0 && t <= 1.0f) { return true; }
+
 	return false;
 }
