@@ -409,6 +409,13 @@ void DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMa
 	}
 }
 
+void DrawSegment(const Segment& segment, Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color)
+{
+	Vector3 start = Transform(Transform(segment.origin, viewProjectionMatrix), viewportMatrix);
+	Vector3 end = Transform(Transform(segment.origin + segment.diff, viewProjectionMatrix), viewportMatrix);
+	Novice::DrawLine(int(start.x), int(start.y), int(end.x), int(end.y), color);
+}
+
 void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color)
 {
 	const float pi = (float)std::numbers::pi;
@@ -443,23 +450,6 @@ void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, con
 	}
 }
 
-bool IsCollideSphere(const Sphere& sphere1, const Sphere& sphere2)
-{
-	float distance = Length(sphere2.center - sphere1.center);
-	if (distance <= sphere1.radius + sphere2.radius) {
-		return true;
-	}
-	return false;
-}
-
-Vector3 Perpendicular(const Vector3& vector)
-{
-	if (vector.x != 0.0f || vector.y != 0.0f) {
-		return { -vector.y,vector.x,0.0f };
-	}
-	return { 0.0f,-vector.z,vector.y };
-}
-
 void DrawPlane(const Plane& plane, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color)
 {
 	Vector3 center = plane.distance * plane.normal;
@@ -482,6 +472,33 @@ void DrawPlane(const Plane& plane, const Matrix4x4& viewProjectionMatrix, const 
 	Novice::DrawLine((int)points[1].x, (int)points[1].y, (int)points[3].x, (int)points[3].y, color);
 }
 
+void DrawTriangle(const Triangle& triangle, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color)
+{
+	Vector3 screenVertics[3]{};
+	for (int i = 0; i < 3; i++) {
+		screenVertics[i] = Transform(Transform(triangle.vertics[i], viewProjectionMatrix), viewportMatrix);
+	}
+	Novice::DrawTriangle(int(screenVertics[0].x), int(screenVertics[0].y), int(screenVertics[1].x), int(screenVertics[1].y),
+		int(screenVertics[2].x), int(screenVertics[2].y), color, kFillModeWireFrame);
+}
+
+bool IsCollideSphere(const Sphere& sphere1, const Sphere& sphere2)
+{
+	float distance = Length(sphere2.center - sphere1.center);
+	if (distance <= sphere1.radius + sphere2.radius) {
+		return true;
+	}
+	return false;
+}
+
+Vector3 Perpendicular(const Vector3& vector)
+{
+	if (vector.x != 0.0f || vector.y != 0.0f) {
+		return { -vector.y,vector.x,0.0f };
+	}
+	return { 0.0f,-vector.z,vector.y };
+}
+
 bool IsCollideSpherePlane(const Sphere& sphere, const Plane& plane)
 {
 	float distance = (Dot(plane.normal, sphere.center) - plane.distance);
@@ -499,5 +516,31 @@ bool IsCollideLinePlane(const Segment& segment, const Plane& plane)
 	float t = (plane.distance - Dot(segment.origin, plane.normal)) / dot;
 	if (t >= 0 && t <= 1.0f) { return true; }
 
+	return false;
+}
+
+bool IsCollideTriangleLine(const Triangle& triangle, const Segment& segment)
+{
+	// cross(vector1,vector2)↓
+	Vector3 normal = Normalize(Cross((triangle.vertics[1] - triangle.vertics[0]), (triangle.vertics[2] - triangle.vertics[1])));
+	float dot = Dot(normal, segment.diff);
+	if (dot == 0.0f) { return false; }	// when perpendicular -> never colliding
+	float t = (Dot(triangle.vertics[0], normal) - Dot(segment.origin, normal)) / dot;
+
+	Vector3 p = segment.origin + t * segment.diff;
+	Vector3 v01 = triangle.vertics[1] - triangle.vertics[0];
+	Vector3 v12 = triangle.vertics[2] - triangle.vertics[1];
+	Vector3 v20 = triangle.vertics[0] - triangle.vertics[2];
+	Vector3 v0p = p - triangle.vertics[0];
+	Vector3 v1p = p - triangle.vertics[1];
+	Vector3 v2p = p - triangle.vertics[2];
+
+	Vector3 cross01 = Cross(v01, v1p);
+	Vector3 cross12 = Cross(v12, v2p);
+	Vector3 cross20 = Cross(v20, v0p);
+
+	if (Dot(cross01, normal) >= 0.0f && Dot(cross12, normal) >= 0.0f && Dot(cross20, normal) >= 0.0f) {
+		return true;
+	}
 	return false;
 }
