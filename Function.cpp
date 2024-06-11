@@ -482,6 +482,43 @@ void DrawTriangle(const Triangle& triangle, const Matrix4x4& viewProjectionMatri
 		int(screenVertics[2].x), int(screenVertics[2].y), color, kFillModeWireFrame);
 }
 
+void DrawAABB(const AABB& aabb, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color)
+{
+	Vector3 bottom[4]{};
+	for (int i = 0; i < 4; i++){
+		bottom[i] = aabb.min;
+	}
+	bottom[1].z += aabb.max.z;
+	bottom[2] = { aabb.min.x + aabb.max.x,bottom[2].y,aabb.min.z + aabb.max.z};
+	bottom[3].x += aabb.max.x;
+
+	Vector3 top[4]{};
+	for (int i = 0; i < 4; i ++ ) {
+		top[i] = aabb.min;
+		top[i].y += aabb.max.y;
+	}
+	top[1].z += aabb.max.z;
+	top[2] = { aabb.min.x + aabb.max.x,top[2].y,aabb.min.z + aabb.max.z};
+	top[3].x += aabb.max.x;
+
+	Vector3 screenBot[4]{};
+	Vector3 screenTop[4]{};
+	for (int i = 0; i < 4; i++) {
+		screenBot[i] = Transform(Transform(bottom[i], viewProjectionMatrix), viewportMatrix);
+		screenTop[i] = Transform(Transform(top[i], viewProjectionMatrix), viewportMatrix);
+	}
+
+	for (int i = 0; i < 3; i ++) {
+		Novice::DrawLine(int(screenBot[i].x), int(screenBot[i].y), int(screenBot[i + 1].x), int(screenBot[i + 1].y), color);
+		Novice::DrawLine(int(screenTop[i].x), int(screenTop[i].y), int(screenTop[i + 1].x), int(screenTop[i + 1].y), color);
+	}
+	Novice::DrawLine(int(screenBot[3].x), int(screenBot[3].y), int(screenBot[0].x), int(screenBot[0].y), color);
+	Novice::DrawLine(int(screenTop[3].x), int(screenTop[3].y), int(screenTop[0].x), int(screenTop[0].y), color);
+	for (int i = 0; i < 4; i++) {
+		Novice::DrawLine(int(screenBot[i].x), int(screenBot[i].y), int(screenTop[i].x), int(screenTop[i].y), color);
+	}
+}
+
 bool IsCollideSphere(const Sphere& sphere1, const Sphere& sphere2)
 {
 	float distance = Length(sphere2.center - sphere1.center);
@@ -543,4 +580,15 @@ bool IsCollideTriangleLine(const Triangle& triangle, const Segment& segment)
 		return true;
 	}
 	return false;
+}
+
+bool IsCollideAABB(const AABB& a, const AABB& b)
+{
+	if ((a.min.x <= b.max.x && a.max.x >= b.min.x) && 
+		(a.min.y <= b.max.y && a.max.y >= b.min.y) &&
+		(a.min.z <= b.max.z && a.max.z >= b.min.z)) 
+	{
+		return true;
+	}
+	else { return false; }
 }

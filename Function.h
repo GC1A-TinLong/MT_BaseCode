@@ -23,6 +23,7 @@ struct Vector3 {
 struct Matrix4x4 {
 	float m[4][4];
 };
+
 struct Sphere {
 	Vector3 center;
 	float radius;
@@ -48,6 +49,11 @@ struct Plane {
 
 struct Triangle {
 	Vector3 vertics[3];
+};
+
+struct AABB {
+	Vector3 min;
+	Vector3 max;
 };
 
 void CameraControl(char* keys, Vector3& cameraPosition, Vector3& cameraRotate);
@@ -94,9 +100,11 @@ void DrawSegment(const Segment& segment, Matrix4x4& viewProjectionMatrix, const 
 void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
 void DrawPlane(const Plane& plane, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
 void DrawTriangle(const Triangle& triangle, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
+void DrawAABB(const AABB& aabb, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
 
 bool IsCollideSphere(const Sphere& sphere1, const Sphere& sphere2);
 Vector3 Perpendicular(const Vector3& vector);
 bool IsCollideSpherePlane(const Sphere& sphere, const Plane& plane);
 bool IsCollideLinePlane(const Segment& segment, const Plane& plane);
 bool IsCollideTriangleLine(const Triangle& triangle, const Segment& segment);
+bool IsCollideAABB(const AABB& a, const AABB& b);
