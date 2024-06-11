@@ -485,8 +485,6 @@ void DrawPlane(const Plane& plane, const Matrix4x4& viewProjectionMatrix, const 
 bool isCollideSpherePlane(const Sphere& sphere, const Plane& plane)
 {
 	float distance = (Dot(plane.normal, sphere.center) - plane.distance);
-	if (fabsf(distance) - sphere.radius <= 0) {
-		return true;
-	}
+	if (fabsf(distance) - sphere.radius <= 0) { return true; }
 	return false;
 }
