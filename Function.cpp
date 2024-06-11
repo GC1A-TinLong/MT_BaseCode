@@ -2,10 +2,10 @@
 
 void CameraControl(char* keys, Vector3& cameraPosition, Vector3& cameraRotate) {
 	if (keys[DIK_Q]) {
-		cameraPosition.y += 0.05f;
+		cameraPosition.y += 0.02f;
 	}
 	if (keys[DIK_E]) {
-		cameraPosition.y -= 0.05f;
+		cameraPosition.y -= 0.02f;
 	}
 	if (keys[DIK_A] && !keys[DIK_LSHIFT]) {
 		cameraPosition.x -= 0.05f;
@@ -501,15 +501,22 @@ bool IsCollideLinePlane(const Segment& segment, const Plane& plane)
 	Vector3 vector = segment.origin - segment.diff;
 	float length = Length(vector);
 	enum LineType { Line, Ray, Segment };
-	LineType lineType = Line;
+	//LineType lineType = Line;
 
-	if (length >= 0 && length <= 1.0f) { lineType = Segment; }
+	ImGui::Begin("Debug Window");
+	ImGui::InputFloat("length", &length, 0.3f , ImGuiInputTextFlags_ReadOnly);
+	ImGui::InputFloat("t", &t, 0.3f , ImGuiInputTextFlags_ReadOnly);
+	ImGui::End();
+
+	/*if (length >= 0 && length <= 1.0f) { lineType = Segment; }
 	else if (length >= 0) { lineType = Ray; }
 	else { lineType = Line; }
 
-	if (lineType == Line) { return true; }
+	if (lineType == Line) { return false; }
 	else if (t >= 0 && lineType == Ray) { return true; }
-	else if (t >= 0 && t <= 1.0f && lineType == Segment) { return true; }
+	else if (t >= 0 && t <= 1.0f && lineType == Segment) { return true; }*/
+
+	if (t >= 0 && t <= 1.0f) { return true; }
 
 	return false;
 }
