@@ -14,9 +14,21 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	Vector3 rotate{};
 	Vector3 translate{ 0,0,0 };
-	Vector3 cameraRotate{ 0.26f,0,0 };
-	Vector3 cameraPosition{ 0.0f,1.9f,-6.49f };
+	Vector3 cameraRotate{ 0,0,0 };
+	Vector3 cameraPosition{ 0.0f,0.25f,-4.49f };
 
+	Triangle triangle{
+		{{ 0,0.5f,0 },
+		{ +0.5f,0,0 },
+		{ -0.5f,0,0 }}
+	};
+	uint32_t triangleColor = WHITE;
+
+	Segment segment{
+		{0,0.2f,-0.5f},
+		{0,0.0f,1.0f}
+	};
+	uint32_t segmentColor = WHITE;
 
 	// キー入力結果を受け取る箱
 	char keys[256] = { 0 };
@@ -45,6 +57,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		CameraControl(keys, cameraPosition, cameraRotate);
 
+		if (IsCollideTriangleLine(triangle, segment)) {
+			segmentColor = RED;
+		}
+		else {
+			segmentColor = WHITE;
+		}
+
 		///
 		/// ↑更新処理ここまで
 		///
@@ -55,9 +74,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		DrawGrid(viewProjectionMatrix, viewportMatrix);
 
+		DrawTriangle(triangle, viewProjectionMatrix, viewportMatrix, triangleColor);
+		DrawSegment(segment, viewProjectionMatrix, viewportMatrix, segmentColor);
+
 		ImGui::Begin("Debug Window");
 		ImGui::DragFloat3("CameraTranslate", &cameraPosition.x, 0.01f);
 		ImGui::DragFloat3("CameraRotate", &cameraRotate.x, 0.01f);
+		ImGui::DragFloat3("triangle.v0", &triangle.vertics[0].x, 0.01f);
+		ImGui::DragFloat3("triangle.v1", &triangle.vertics[1].x, 0.01f);
+		ImGui::DragFloat3("triangle.v2", &triangle.vertics[2].x, 0.01f);
+		ImGui::DragFloat3("segment.origin", &segment.origin.x, 0.01f);
+		ImGui::DragFloat3("segment.diff", &segment.diff.x, 0.01f);
 		ImGui::End();
 
 		///

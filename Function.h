@@ -46,6 +46,10 @@ struct Plane {
 	float distance;
 };
 
+struct Triangle {
+	Vector3 vertics[3];
+};
+
 void CameraControl(char* keys, Vector3& cameraPosition, Vector3& cameraRotate);
 
 void VectorScreenPrintf(int x, int y, const Vector3& vector, const char* label);
@@ -86,9 +90,13 @@ Matrix4x4 MakeViewportMatrix(float left, float top, float width, float height, f
 
 void DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix);
 
+void DrawSegment(const Segment& segment, Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
 void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
+void DrawPlane(const Plane& plane, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
+void DrawTriangle(const Triangle& triangle, const Matrix4x4 &viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
+
 bool IsCollideSphere(const Sphere& sphere1, const Sphere& sphere2);
 Vector3 Perpendicular(const Vector3& vector);
-void DrawPlane(const Plane& plane, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
 bool IsCollideSpherePlane(const Sphere& sphere, const Plane& plane);
 bool IsCollideLinePlane(const Segment& segment, const Plane& plane);
+bool IsCollideTriangleLine(const Triangle& triangle, const Segment& segment);
