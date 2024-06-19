@@ -484,31 +484,31 @@ void DrawTriangle(const Triangle& triangle, const Matrix4x4& viewProjectionMatri
 
 void DrawAABB(const AABB& aabb, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color)
 {
-	Vector3 bottom[4]{};
-	for (int i = 0; i < 4; i++){
-		bottom[i] = aabb.min;
+	Vector3 bot[4]{};
+	for (int i = 0; i < 4; i++) {
+		bot[i] = aabb.min;
 	}
-	bottom[1].z += aabb.max.z;
-	bottom[2] = { aabb.min.x + aabb.max.x,bottom[2].y,aabb.min.z + aabb.max.z};
-	bottom[3].x += aabb.max.x;
+	bot[1].z += aabb.max.z;
+	bot[2] = { aabb.min.x + aabb.max.x,bot[2].y,aabb.min.z + aabb.max.z };
+	bot[3].x += aabb.max.x;
 
 	Vector3 top[4]{};
-	for (int i = 0; i < 4; i ++ ) {
+	for (int i = 0; i < 4; i++) {
 		top[i] = aabb.min;
 		top[i].y += aabb.max.y;
 	}
 	top[1].z += aabb.max.z;
-	top[2] = { aabb.min.x + aabb.max.x,top[2].y,aabb.min.z + aabb.max.z};
+	top[2] = { aabb.min.x + aabb.max.x,top[2].y,aabb.min.z + aabb.max.z };
 	top[3].x += aabb.max.x;
 
 	Vector3 screenBot[4]{};
 	Vector3 screenTop[4]{};
 	for (int i = 0; i < 4; i++) {
-		screenBot[i] = Transform(Transform(bottom[i], viewProjectionMatrix), viewportMatrix);
+		screenBot[i] = Transform(Transform(bot[i], viewProjectionMatrix), viewportMatrix);
 		screenTop[i] = Transform(Transform(top[i], viewProjectionMatrix), viewportMatrix);
 	}
 
-	for (int i = 0; i < 3; i ++) {
+	for (int i = 0; i < 3; i++) {
 		Novice::DrawLine(int(screenBot[i].x), int(screenBot[i].y), int(screenBot[i + 1].x), int(screenBot[i + 1].y), color);
 		Novice::DrawLine(int(screenTop[i].x), int(screenTop[i].y), int(screenTop[i + 1].x), int(screenTop[i + 1].y), color);
 	}
@@ -584,9 +584,9 @@ bool IsCollideTriangleLine(const Triangle& triangle, const Segment& segment)
 
 bool IsCollideAABB(const AABB& a, const AABB& b)
 {
-	if ((a.min.x <= b.max.x && a.max.x >= b.min.x) && 
-		(a.min.y <= b.max.y && a.max.y >= b.min.y) &&
-		(a.min.z <= b.max.z && a.max.z >= b.min.z)) 
+	if ((a.min.x <= b.max.x + b.min.x && a.max.x + a.min.x >= b.min.x) &&
+		(a.min.y <= b.max.y + b.min.y && a.max.y + a.min.y >= b.min.y) &&
+		(a.min.z <= b.max.z + b.min.z && a.max.z + a.min.z >= b.min.z))
 	{
 		return true;
 	}

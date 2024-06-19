@@ -3,6 +3,7 @@
 #include <imgui.h>
 #include <algorithm>
 
+
 const char kWindowTitle[] = "GC2A_08_チョウ_テンロウ";
 
 // Windowsアプリでのエントリーポイント(main関数)
@@ -19,12 +20,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Vector3 cameraPosition{ 0.0f,1.9f,-6.49f };
 
 	AABB aabb1{
-		{0.1f,0.2f,-0.1f},
+		{-1.5f,0.0f,-1.1f},
 		{0.4f,0.4f,0.2f}
 	};
 	uint32_t aabb1Color = WHITE;
 	AABB aabb2{
-		{0.2f,0.2f,0.2f},
+		{0.2f,0.0f,-1.1f},
 		{1.0f,1.0f,1.0f}
 	};
 	uint32_t aabb2Color = WHITE;
@@ -56,14 +57,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		CameraControl(keys, cameraPosition, cameraRotate);
 
-		aabb1.min.x = std::clamp(aabb1.min.x, aabb1.min.x, aabb1.max.x);
-		aabb1.max.x = std::clamp(aabb1.max.x, aabb1.min.x, aabb1.max.x);
-		aabb1.min.y = std::clamp(aabb1.min.y, aabb1.min.y, aabb1.max.y);
-		aabb1.max.y = std::clamp(aabb1.max.y, aabb1.min.y, aabb1.max.y);
-		aabb1.min.z = std::clamp(aabb1.min.z, aabb1.min.z, aabb1.max.z);
-		aabb1.max.z = std::clamp(aabb1.max.z, aabb1.min.z, aabb1.max.z);
+		aabb1.min.x = (std::min)(aabb1.min.x, aabb1.max.x);
+		aabb1.max.x = (std::max)(aabb1.min.x, aabb1.max.x);
+		aabb1.min.y = (std::min)(aabb1.min.y, aabb1.max.y);
+		aabb1.max.y = (std::max)(aabb1.min.y, aabb1.max.y);
+		aabb1.min.z = (std::min)(aabb1.min.z, aabb1.max.z);
+		aabb1.max.z = (std::max)(aabb1.min.z, aabb1.max.z);
 
-		if (IsCollideAABB(aabb1, aabb2)) { aabb1Color = RED; }
+		if (IsCollideAABB(aabb1, aabb2)) { 
+			aabb1Color = RED; 
+		}
 		else { aabb1Color = WHITE; }
 
 		///
