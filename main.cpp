@@ -20,13 +20,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Vector3 cameraPosition{ 0.0f,1.9f,-6.49f };
 
 	AABB aabb1{
-		{-1.5f,0.0f,-1.1f},
-		{0.4f,0.4f,0.2f}
+		{-1.5f,0.0f,-0.5},
+		{-1.0f,0.4f,0.2f}
 	};
 	uint32_t aabb1Color = WHITE;
 	AABB aabb2{
-		{0.2f,0.0f,-1.1f},
-		{1.0f,1.0f,1.0f}
+		{0.2f,0.0f,-0.5f},
+		{1.2f,1.0f,0.5f}
 	};
 	uint32_t aabb2Color = WHITE;
 
