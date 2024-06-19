@@ -416,13 +416,6 @@ void DrawSegment(const Segment& segment, Matrix4x4& viewProjectionMatrix, const 
 	Novice::DrawLine(int(start.x), int(start.y), int(end.x), int(end.y), color);
 }
 
-void DrawSegment(const Segment& segment, Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color)
-{
-	Vector3 start = Transform(Transform(segment.origin, viewProjectionMatrix), viewportMatrix);
-	Vector3 end = Transform(Transform(segment.origin + segment.diff, viewProjectionMatrix), viewportMatrix);
-	Novice::DrawLine(int(start.x), int(start.y), int(end.x), int(end.y), color);
-}
-
 void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color)
 {
 	const float pi = (float)std::numbers::pi;
@@ -597,5 +590,5 @@ bool IsCollideAABB(const AABB& a, const AABB& b)
 	{
 		return true;
 	}
-	return false;
+	else { return false; }
 }
