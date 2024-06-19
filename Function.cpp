@@ -588,3 +588,14 @@ bool IsCollideTriangleLine(const Triangle& triangle, const Segment& segment)
 	}
 	return false;
 }
+
+bool IsCollideAABB(const AABB& a, const AABB& b)
+{
+	if ((a.min.x <= b.max.x + b.min.x && a.max.x + a.min.x >= b.min.x) &&
+		(a.min.y <= b.max.y + b.min.y && a.max.y + a.min.y >= b.min.y) &&
+		(a.min.z <= b.max.z + b.min.z && a.max.z + a.min.z >= b.min.z))
+	{
+		return true;
+	}
+	return false;
+}
