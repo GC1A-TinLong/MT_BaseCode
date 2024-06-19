@@ -488,18 +488,18 @@ void DrawAABB(const AABB& aabb, const Matrix4x4& viewProjectionMatrix, const Mat
 	for (int i = 0; i < 4; i++) {
 		bot[i] = aabb.min;
 	}
-	bot[1].z = aabb.max.z;
-	bot[2] = { aabb.max.x, aabb.min.y, aabb.max.z };
-	bot[3].x = aabb.max.x;
+	bot[1].z += aabb.max.z;
+	bot[2] = { aabb.min.x + aabb.max.x, aabb.min.y, aabb.min.z + aabb.max.z };
+	bot[3].x += aabb.max.x;
 
 	Vector3 top[4]{};
 	for (int i = 0; i < 4; i++) {
 		top[i] = aabb.min;
 		top[i].y = aabb.max.y;
 	}
-	top[1].z = aabb.max.z;
-	top[2] = { aabb.max.x,aabb.max.y,aabb.max.z };
-	top[3].x = aabb.max.x;
+	top[1].z += aabb.max.z;
+	top[2] = { aabb.min.x + aabb.max.x,aabb.max.y,aabb.min.z + aabb.max.z };
+	top[3].x += aabb.max.x;
 
 	Vector3 screenBot[4]{};
 	Vector3 screenTop[4]{};
@@ -584,11 +584,23 @@ bool IsCollideTriangleLine(const Triangle& triangle, const Segment& segment)
 
 bool IsCollideAABB(const AABB& a, const AABB& b)
 {
-	if ((a.min.x <= b.max.x && a.max.x >= b.min.x) &&
-		(a.min.y <= b.max.y && a.max.y >= b.min.y) &&
-		(a.min.z <= b.max.z && a.max.z >= b.min.z))
+	if ((a.min.x <= b.min.x + b.max.x && a.min.x + a.max.x >= b.min.x) &&
+		(a.min.y <= b.min.y + b.max.y && a.min.y + a.max.y >= b.min.y) &&
+		(a.min.z <= b.min.z + b.max.z && a.min.z + a.max.z >= b.min.z))
 	{
 		return true;
 	}
 	else { return false; }
+}
+
+bool IsCollideAABBSphere(const AABB& aabb, const Sphere& sphere)
+{
+	Vector3 closestPoint{
+		std::clamp(sphere.center.x,aabb.min.x,aabb.max.x),
+		std::clamp(sphere.center.y,aabb.min.y,aabb.max.y) ,
+		std::clamp(sphere.center.z,aabb.min.z,aabb.max.z) };
+	float distance = Length(closestPoint - sphere.center);
+
+	if (distance <= sphere.radius) { return true; }
+	return false;
 }

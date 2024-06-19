@@ -19,16 +19,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Vector3 cameraRotate{ 0.26f,0,0 };
 	Vector3 cameraPosition{ 0.0f,1.9f,-6.49f };
 
-	AABB aabb1{
+	AABB aabb{
 		{-1.5f,0.0f,-0.5},
 		{-1.0f,0.4f,0.2f}
 	};
-	uint32_t aabb1Color = WHITE;
-	AABB aabb2{
+	uint32_t aabbColor = WHITE;
+	Sphere sphere{
 		{0.2f,0.0f,-0.5f},
-		{1.2f,1.0f,0.5f}
+		0.8f
 	};
-	uint32_t aabb2Color = WHITE;
+	uint32_t sphereColor = WHITE;
 
 	// キー入力結果を受け取る箱
 	char keys[256] = { 0 };
@@ -57,17 +57,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		CameraControl(keys, cameraPosition, cameraRotate);
 
-		aabb1.min.x = (std::min)(aabb1.min.x, aabb1.max.x);
-		aabb1.max.x = (std::max)(aabb1.min.x, aabb1.max.x);
-		aabb1.min.y = (std::min)(aabb1.min.y, aabb1.max.y);
-		aabb1.max.y = (std::max)(aabb1.min.y, aabb1.max.y);
-		aabb1.min.z = (std::min)(aabb1.min.z, aabb1.max.z);
-		aabb1.max.z = (std::max)(aabb1.min.z, aabb1.max.z);
+		aabb.min.x = (std::min)(aabb.min.x, aabb.max.x);
+		aabb.max.x = (std::max)(aabb.min.x, aabb.max.x);
+		aabb.min.y = (std::min)(aabb.min.y, aabb.max.y);
+		aabb.max.y = (std::max)(aabb.min.y, aabb.max.y);
+		aabb.min.z = (std::min)(aabb.min.z, aabb.max.z);
+		aabb.max.z = (std::max)(aabb.min.z, aabb.max.z);
 
-		if (IsCollideAABB(aabb1, aabb2)) { 
-			aabb1Color = RED; 
+		if (IsCollideAABBSphere(aabb, sphere)) { 
+			aabbColor = RED; 
 		}
-		else { aabb1Color = WHITE; }
+		else { aabbColor = WHITE; }
 
 		///
 		/// ↑更新処理ここまで
@@ -79,16 +79,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		DrawGrid(viewProjectionMatrix, viewportMatrix);
 
-		DrawAABB(aabb1, viewProjectionMatrix, viewportMatrix, aabb1Color);
-		DrawAABB(aabb2, viewProjectionMatrix, viewportMatrix, aabb2Color);
+		DrawAABB(aabb, viewProjectionMatrix, viewportMatrix, aabbColor);
+		DrawSphere(sphere, viewProjectionMatrix, viewportMatrix, sphereColor);
 
 		ImGui::Begin("Debug Window");
 		ImGui::DragFloat3("CameraTranslate", &cameraPosition.x, 0.01f);
 		ImGui::DragFloat3("CameraRotate", &cameraRotate.x, 0.01f);
-		ImGui::DragFloat3("AABB1.min", &aabb1.min.x, 0.01f);
-		ImGui::DragFloat3("AABB1.max", &aabb1.max.x, 0.01f);
-		ImGui::DragFloat3("AABB2.min", &aabb2.min.x, 0.01f);
-		ImGui::DragFloat3("AABB2.max", &aabb2.max.x, 0.01f);
+		ImGui::DragFloat3("AABB.min", &aabb.min.x, 0.01f);
+		ImGui::DragFloat3("AABB.max", &aabb.max.x, 0.01f);
+		ImGui::DragFloat3("sphere.center", &sphere.center.x, 0.01f);
+		ImGui::DragFloat("sphere.radius", &sphere.radius, 0.01f);
 		ImGui::End();
 
 		///

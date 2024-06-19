@@ -6,6 +6,7 @@
 #include <math.h>
 #include <iostream>
 #include <imgui.h>
+#include <algorithm>
 
 static const int kRowHeight = 20;
 static const int kColumnWidth = 60;
@@ -108,3 +109,4 @@ bool IsCollideSpherePlane(const Sphere& sphere, const Plane& plane);
 bool IsCollideLinePlane(const Segment& segment, const Plane& plane);
 bool IsCollideTriangleLine(const Triangle& triangle, const Segment& segment);
 bool IsCollideAABB(const AABB& a, const AABB& b);
+bool IsCollideAABBSphere(const AABB& aabb, const Sphere& sphere);
