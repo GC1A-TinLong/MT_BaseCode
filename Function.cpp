@@ -416,6 +416,13 @@ void DrawSegment(const Segment& segment, Matrix4x4& viewProjectionMatrix, const 
 	Novice::DrawLine(int(start.x), int(start.y), int(end.x), int(end.y), color);
 }
 
+void DrawSegment(const Segment& segment, Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color)
+{
+	Vector3 start = Transform(Transform(segment.origin, viewProjectionMatrix), viewportMatrix);
+	Vector3 end = Transform(Transform(segment.origin + segment.diff, viewProjectionMatrix), viewportMatrix);
+	Novice::DrawLine(int(start.x), int(start.y), int(end.x), int(end.y), color);
+}
+
 void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color)
 {
 	const float pi = (float)std::numbers::pi;
@@ -480,6 +487,43 @@ void DrawTriangle(const Triangle& triangle, const Matrix4x4& viewProjectionMatri
 	}
 	Novice::DrawTriangle(int(screenVertics[0].x), int(screenVertics[0].y), int(screenVertics[1].x), int(screenVertics[1].y),
 		int(screenVertics[2].x), int(screenVertics[2].y), color, kFillModeWireFrame);
+}
+
+void DrawAABB(const AABB& aabb, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color)
+{
+	Vector3 bot[4]{};
+	for (int i = 0; i < 4; i++) {
+		bot[i] = aabb.min;
+	}
+	bot[1].z += aabb.max.z;
+	bot[2] = { aabb.min.x + aabb.max.x,bot[2].y,aabb.min.z + aabb.max.z };
+	bot[3].x += aabb.max.x;
+
+	Vector3 top[4]{};
+	for (int i = 0; i < 4; i++) {
+		top[i] = aabb.min;
+		top[i].y += aabb.max.y;
+	}
+	top[1].z += aabb.max.z;
+	top[2] = { aabb.min.x + aabb.max.x,top[2].y,aabb.min.z + aabb.max.z };
+	top[3].x += aabb.max.x;
+
+	Vector3 screenBot[4]{};
+	Vector3 screenTop[4]{};
+	for (int i = 0; i < 4; i++) {
+		screenBot[i] = Transform(Transform(bot[i], viewProjectionMatrix), viewportMatrix);
+		screenTop[i] = Transform(Transform(top[i], viewProjectionMatrix), viewportMatrix);
+	}
+
+	for (int i = 0; i < 3; i++) {
+		Novice::DrawLine(int(screenBot[i].x), int(screenBot[i].y), int(screenBot[i + 1].x), int(screenBot[i + 1].y), color);
+		Novice::DrawLine(int(screenTop[i].x), int(screenTop[i].y), int(screenTop[i + 1].x), int(screenTop[i + 1].y), color);
+	}
+	Novice::DrawLine(int(screenBot[3].x), int(screenBot[3].y), int(screenBot[0].x), int(screenBot[0].y), color);
+	Novice::DrawLine(int(screenTop[3].x), int(screenTop[3].y), int(screenTop[0].x), int(screenTop[0].y), color);
+	for (int i = 0; i < 4; i++) {
+		Novice::DrawLine(int(screenBot[i].x), int(screenBot[i].y), int(screenTop[i].x), int(screenTop[i].y), color);
+	}
 }
 
 bool IsCollideSphere(const Sphere& sphere1, const Sphere& sphere2)
