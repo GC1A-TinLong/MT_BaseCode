@@ -551,8 +551,8 @@ bool IsCollideLinePlane(const Segment& segment, const Plane& plane)
 	if (dot == 0.0f) { return false; }	// when perpendicular -> never colliding
 
 	float t = (plane.distance - Dot(segment.origin, plane.normal)) / dot;
-	if (t >= 0 && t <= 1.0f) { 
-		return true; 
+	if (t >= 0 && t <= 1.0f) {
+		return true;
 	}
 	return false;
 }
@@ -624,8 +624,37 @@ bool IsCollideAABBSegment(const AABB& aabb, const Segment& segment)
 	float tFarY = max(tyMin, tyMax);
 	float tFarZ = max(tzMin, tzMax);
 
-	float tmin = max(max(tNearX, tNearY), tNearZ);
-	float tmax = min(min(tFarX, tFarY), tFarZ);
+	// setting it to infinite for however small/big it is, it still able to track down the number (closest/furthest)
+	float tmin = -std::numeric_limits<float>::infinity();
+	float tmax = +std::numeric_limits<float>::infinity();
 
-	return tmin <= tmax;
+	if (segment.diff.x != 0) {
+		tmin = max(tmin, tNearX);
+		tmax = min(tmax, tFarX);
+	}
+	else {
+		if (segment.origin.x<aabb.min.x || segment.origin.x>aabb.min.x + aabb.max.x) {
+			return false;
+		}
+	}
+	if (segment.diff.y != 0) {
+		tmin = max(tmin, tNearY);
+		tmax = min(tmax, tFarY);
+	}
+	else {
+		if (segment.origin.y<aabb.min.y || segment.origin.y>aabb.min.y + aabb.max.y) {
+			return false;
+		}
+	}
+	if (segment.diff.z != 0) {
+		tmin = max(tmin, tNearZ);
+		tmax = min(tmax, tFarZ);
+	}
+	else {
+		if (segment.origin.z<aabb.min.z || segment.origin.z>aabb.min.z + aabb.max.z) {
+			return false;
+		}
+	}
+
+	return tmin <= tmax && tmax >= 0;
 }
