@@ -551,8 +551,9 @@ bool IsCollideLinePlane(const Segment& segment, const Plane& plane)
 	if (dot == 0.0f) { return false; }	// when perpendicular -> never colliding
 
 	float t = (plane.distance - Dot(segment.origin, plane.normal)) / dot;
-	if (t >= 0 && t <= 1.0f) { return true; }
-
+	if (t >= 0 && t <= 1.0f) { 
+		return true; 
+	}
 	return false;
 }
 
@@ -601,6 +602,30 @@ bool IsCollideAABBSphere(const AABB& aabb, const Sphere& sphere)
 		std::clamp(sphere.center.z,aabb.min.z,aabb.max.z) };
 	float distance = Length(closestPoint - sphere.center);
 
-	if (distance <= sphere.radius) { return true; }
+	if (distance <= sphere.radius) {
+		return true;
+	}
 	return false;
+}
+
+bool IsCollideAABBSegment(const AABB& aabb, const Segment& segment)
+{
+	float txMin = (aabb.min.x - segment.origin.x) / segment.diff.x;
+	float txMax = (aabb.min.x + aabb.max.x - segment.origin.x) / segment.diff.x;
+	float tyMin = (aabb.min.y - segment.origin.y) / segment.diff.y;
+	float tyMax = (aabb.min.y + aabb.max.y - segment.origin.y) / segment.diff.y;
+	float tzMin = (aabb.min.z - segment.origin.z) / segment.diff.z;
+	float tzMax = (aabb.min.z + aabb.max.z - segment.origin.z) / segment.diff.z;
+
+	float tNearX = min(txMin, txMax);
+	float tNearY = min(tyMin, tyMax);
+	float tNearZ = min(tzMin, tzMax);
+	float tFarX = max(txMin, txMax);
+	float tFarY = max(tyMin, tyMax);
+	float tFarZ = max(tzMin, tzMax);
+
+	float tmin = max(max(tNearX, tNearY), tNearZ);
+	float tmax = min(min(tFarX, tFarY), tFarZ);
+
+	return tmin <= tmax;
 }

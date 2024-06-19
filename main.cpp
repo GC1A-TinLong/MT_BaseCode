@@ -20,15 +20,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Vector3 cameraPosition{ 0.0f,1.9f,-6.49f };
 
 	AABB aabb{
-		{-1.5f,0.0f,-0.5},
-		{-1.0f,0.4f,0.2f}
+		{-0.5f,-0.5f,-0.5f},
+		{1.0f,1.0f,1.0f}
 	};
 	uint32_t aabbColor = WHITE;
-	Sphere sphere{
-		{0.2f,0.0f,-0.5f},
-		0.8f
+	Segment segment{
+		{-0.7f,0.3f,0.0f},
+		{2.0f,-0.5f,0.0f}
 	};
-	uint32_t sphereColor = WHITE;
+	uint32_t segmentColor = WHITE;
 
 	// キー入力結果を受け取る箱
 	char keys[256] = { 0 };
@@ -64,7 +64,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		aabb.min.z = (std::min)(aabb.min.z, aabb.max.z);
 		aabb.max.z = (std::max)(aabb.min.z, aabb.max.z);
 
-		if (IsCollideAABBSphere(aabb, sphere)) { 
+		if (IsCollideAABBSegment(aabb, segment)) { 
 			aabbColor = RED; 
 		}
 		else { aabbColor = WHITE; }
@@ -80,15 +80,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		DrawGrid(viewProjectionMatrix, viewportMatrix);
 
 		DrawAABB(aabb, viewProjectionMatrix, viewportMatrix, aabbColor);
-		DrawSphere(sphere, viewProjectionMatrix, viewportMatrix, sphereColor);
+		DrawSegment(segment, viewProjectionMatrix, viewportMatrix, segmentColor);
 
 		ImGui::Begin("Debug Window");
 		ImGui::DragFloat3("CameraTranslate", &cameraPosition.x, 0.01f);
 		ImGui::DragFloat3("CameraRotate", &cameraRotate.x, 0.01f);
 		ImGui::DragFloat3("AABB.min", &aabb.min.x, 0.01f);
 		ImGui::DragFloat3("AABB.max", &aabb.max.x, 0.01f);
-		ImGui::DragFloat3("sphere.center", &sphere.center.x, 0.01f);
-		ImGui::DragFloat("sphere.radius", &sphere.radius, 0.01f);
+		ImGui::DragFloat3("segment.origin", &segment.origin.x, 0.01f);
+		ImGui::DragFloat3("segment.diff", &segment.diff.x, 0.01f);
 		ImGui::End();
 
 		///
