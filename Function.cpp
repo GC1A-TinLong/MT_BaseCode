@@ -99,6 +99,15 @@ Vector3 operator*(float scalar, const Vector3& v)
 	return result;
 }
 
+Vector3 operator*(const Vector3& v, float scalar)
+{
+	Vector3 result{};
+	result.x = scalar * v.x;
+	result.y = scalar * v.y;
+	result.z = scalar * v.z;
+	return result;
+}
+
 float Dot(const Vector3& v1, const Vector3& v2)
 {
 	return (v1.x * v2.x + v1.y * v2.y + v1.z * v2.z);
@@ -657,4 +666,42 @@ bool IsCollideAABBSegment(const AABB& aabb, const Segment& segment)
 	}
 
 	return tmin <= tmax && tmax >= 0;
+}
+
+bool IsCollideOBBSphere(OBB& obb, const Sphere& sphere, Vector3& rotate)
+{
+	Matrix4x4 rotateMatrix = MakeRotateXMatrix(rotate.x) * MakeRotateYMatrix(rotate.y) * MakeRotateZMatrix(rotate.z);
+
+	obb.orientations[0].x = rotateMatrix.m[0][0];
+	obb.orientations[0].y = rotateMatrix.m[0][1];
+	obb.orientations[0].z = rotateMatrix.m[0][2];
+
+	obb.orientations[1].x = rotateMatrix.m[1][0];
+	obb.orientations[1].y = rotateMatrix.m[1][1];
+	obb.orientations[1].z = rotateMatrix.m[1][2];
+
+	obb.orientations[2].x = rotateMatrix.m[2][0];
+	obb.orientations[2].y = rotateMatrix.m[2][1];
+	obb.orientations[2].z = rotateMatrix.m[2][2];
+
+	Matrix4x4 obbWorldMatrix = {
+		obb.orientations[0].x,obb.orientations[0].y,obb.orientations[0].z,0,
+		obb.orientations[1].x,obb.orientations[1].y,obb.orientations[1].z,0,
+		obb.orientations[2].x,obb.orientations[2].y,obb.orientations[2].z,0,
+		0,0,0,1.0f
+	};
+	Matrix4x4 inverseObbWorldMatrix = Transpose(obbWorldMatrix);
+
+	Vector3 centerInObbLocalSpace = Transform(sphere.center, inverseObbWorldMatrix);
+
+	AABB aabbObbLocal = {
+		obb.size * -1,
+		obb.size
+	};
+	Sphere sphereObbLocal = {
+		centerInObbLocalSpace,
+		sphere.radius
+	};
+
+	return IsCollideAABBSphere(aabbObbLocal, sphereObbLocal);
 }
