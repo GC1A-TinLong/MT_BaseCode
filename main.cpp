@@ -32,14 +32,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	};
 	uint32_t obbColor = WHITE;
 
-	/*AABB aabb{
-		obb.size * -1.0f,
-		aabb.min + obb.size
-	};*/
 	AABB aabb{
+		obb.size * -1.0f,
+		obb.size
+	};
+	/*AABB aabb{
 		{-0.5f,-0.5f,-0.5f},
 		{1.0f,1.0f,1.0f}
-	};
+	};*/
 
 	Sphere sphere{
 		.center{0.0f,0.0f,0.0f},
