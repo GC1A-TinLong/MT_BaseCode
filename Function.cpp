@@ -668,10 +668,8 @@ bool IsCollideAABBSegment(const AABB& aabb, const Segment& segment)
 	return tmin <= tmax && tmax >= 0;
 }
 
-bool IsCollideOBBSphere(OBB& obb, const Sphere& sphere, Vector3& rotate)
+bool IsCollideOBBSphere(OBB& obb, const Sphere& sphere, Matrix4x4& rotateMatrix)
 {
-	Matrix4x4 rotateMatrix = MakeRotateXMatrix(rotate.x) * MakeRotateYMatrix(rotate.y) * MakeRotateZMatrix(rotate.z);
-
 	obb.orientations[0].x = rotateMatrix.m[0][0];
 	obb.orientations[0].y = rotateMatrix.m[0][1];
 	obb.orientations[0].z = rotateMatrix.m[0][2];
@@ -695,8 +693,8 @@ bool IsCollideOBBSphere(OBB& obb, const Sphere& sphere, Vector3& rotate)
 	Vector3 centerInObbLocalSpace = Transform(sphere.center, inverseObbWorldMatrix);
 
 	AABB aabbObbLocal = {
-		obb.size * -1,
-		obb.size
+		obb.size * -1.0f,
+		aabbObbLocal.min + obb.size
 	};
 	Sphere sphereObbLocal = {
 		centerInObbLocalSpace,

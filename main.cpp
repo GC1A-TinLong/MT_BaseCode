@@ -16,10 +16,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	Vector3 worldRotate{};
 	Vector3 translate{ 0,0,0 };
-	Vector3 cameraRotate{ 0.26f,0,0 };
-	Vector3 cameraPosition{ 0.0f,1.9f,-6.49f };
+	Vector3 cameraRotate{ 0.0f,0,0 };
+	Vector3 cameraPosition{ 0.0f,0.1f,-6.49f };
 
 	Vector3 rotate{};
+	Matrix4x4 rotateMatrix{};
 	OBB obb{
 		.center{-1.0f,0.0f,0.0f},
 		.orientations = {
@@ -31,9 +32,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	};
 	uint32_t obbColor = WHITE;
 
+	/*AABB aabb{
+		obb.size * -1.0f,
+		aabb.min + obb.size
+	};*/
 	AABB aabb{
-		obb.size * -1,
-		obb.size
+		{-0.5f,-0.5f,-0.5f},
+		{1.0f,1.0f,1.0f}
 	};
 
 	Sphere sphere{
@@ -69,7 +74,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		CameraControl(keys, cameraPosition, cameraRotate);
 
-		if (IsCollideOBBSphere(obb, sphere, rotate)) {
+		rotateMatrix = MakeRotateXMatrix(rotate.x) * MakeRotateYMatrix(rotate.y) * MakeRotateZMatrix(rotate.z);
+		if (IsCollideOBBSphere(obb, sphere, rotateMatrix)) {
 			obbColor = RED;
 		}
 		else { obbColor = WHITE; }
@@ -99,6 +105,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		ImGui::DragFloat3("OBB.size", &obb.size.x, 0.01f);
 		ImGui::DragFloat3("Sphere.center", &sphere.center.x, 0.01f);
 		ImGui::DragFloat("Sphere.radius", &sphere.radius, 0.01f);
+		ImGui::DragFloat3("aabb.min", &aabb.min.x, 0.01f);
+		ImGui::DragFloat3("aabb.max", &aabb.max.x, 0.01f);
 		ImGui::End();
 
 		///
