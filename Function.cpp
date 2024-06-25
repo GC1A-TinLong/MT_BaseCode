@@ -164,6 +164,18 @@ Vector3 Bezier(const Vector3& p0, const Vector3& p1, const Vector3& p2, float t)
 	return Lerp(p0p1, p1p2, t);
 }
 
+Vector3 Catmull(const Vector3& p0, const Vector3& p1, const Vector3& p2, const Vector3& p3, float t)
+{
+	Vector3 result{};
+	result.x = 0.5f * ((-p0.x + 3 * p1.x - 3 * p2.x + p3.x) * powf(t, 3.0f) + (2 * p0.x - 5 * p1.x + 4 * p2.x - p3.x) * powf(t, 2.0f) +
+		(-p0.x + p2.x) * t + (2 * p1.x));
+	result.y = 0.5f * ((-p0.y + 3 * p1.y - 3 * p2.y + p3.y) * powf(t, 3.0f) + (2 * p0.y - 5 * p1.y + 4 * p2.y - p3.y) * powf(t, 2.0f) +
+		(-p0.y + p2.y) * t + (2 * p1.y));
+	result.z = 0.5f * ((-p0.z + 3 * p1.z - 3 * p2.z + p3.z) * powf(t, 3.0f) + (2 * p0.z - 5 * p1.z + 4 * p2.z - p3.z) * powf(t, 2.0f) +
+		(-p0.z + p2.z) * t + (2 * p1.z));
+	return result;
+}
+
 Matrix4x4 operator+(const Matrix4x4& m1, const Matrix4x4& m2)
 {
 	Matrix4x4 result{};
@@ -546,7 +558,7 @@ void DrawAABB(const AABB& aabb, const Matrix4x4& viewProjectionMatrix, const Mat
 
 void DrawBezier(const Vector3& p0, const Vector3& p1, const Vector3& p2, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color)
 {
-	const int kSegmentNum = 32;
+	const int kSegmentNum = 16;
 	for (int i = 0; i < kSegmentNum; i++) {
 		float t0 = i / (float)kSegmentNum;
 		float t1 = (i + 1) / (float)kSegmentNum;
@@ -563,6 +575,59 @@ void DrawBezier(const Vector3& p0, const Vector3& p1, const Vector3& p2, const M
 		}
 		if (i == (kSegmentNum / 2) - 1 || i == kSegmentNum - 1) {
 			Novice::DrawEllipse(int(screenBezier1.x), int(screenBezier1.y), 3, 3, 0.0f, BLACK, kFillModeSolid);
+		}
+	}
+}
+
+void DrawCatmullRom(const Vector3& p0, const Vector3& p1, const Vector3& p2, const Vector3& p3, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color)
+{
+	const int kSegmentNum = 16;
+	for (int i = 0; i < kSegmentNum; i++) {
+		float t0 = i / (float)kSegmentNum;
+		float t1 = (i + 1) / (float)kSegmentNum;
+
+		Vector3 catmull0 = Catmull(p0, p0, p1, p2, t0);
+		Vector3 catmull1 = Catmull(p0, p0, p1, p2, t1);
+
+		Vector3 screenCatmull0 = Transform(Transform(catmull0, viewProjectionMatrix), viewportMatrix);
+		Vector3 screenCatmull1 = Transform(Transform(catmull1, viewProjectionMatrix), viewportMatrix);
+
+		Novice::DrawLine((int)screenCatmull0.x, (int)screenCatmull0.y, (int)screenCatmull1.x, (int)screenCatmull1.y, color);
+		if (i == 0) {
+			Novice::DrawEllipse(int(screenCatmull0.x), int(screenCatmull0.y), 3, 3, 0.0f, BLACK, kFillModeSolid);
+		}
+	}
+	for (int i = 0; i < kSegmentNum; i++) {
+		float t0 = i / (float)kSegmentNum;
+		float t1 = (i + 1) / (float)kSegmentNum;
+
+		Vector3 catmull0 = Catmull(p0, p1, p2, p3, t0);
+		Vector3 catmull1 = Catmull(p0, p1, p2, p3, t1);
+
+		Vector3 screenCatmull0 = Transform(Transform(catmull0, viewProjectionMatrix), viewportMatrix);
+		Vector3 screenCatmull1 = Transform(Transform(catmull1, viewProjectionMatrix), viewportMatrix);
+
+		Novice::DrawLine((int)screenCatmull0.x, (int)screenCatmull0.y, (int)screenCatmull1.x, (int)screenCatmull1.y, color);
+		if (i == 0) {
+			Novice::DrawEllipse(int(screenCatmull0.x), int(screenCatmull0.y), 3, 3, 0.0f, BLACK, kFillModeSolid);
+		}
+	}
+	for (int i = 0; i < kSegmentNum; i++) {
+		float t0 = i / (float)kSegmentNum;
+		float t1 = (i + 1) / (float)kSegmentNum;
+
+		Vector3 catmull0 = Catmull(p1, p2, p3, p3, t0);
+		Vector3 catmull1 = Catmull(p1, p2, p3, p3, t1);
+
+		Vector3 screenCatmull0 = Transform(Transform(catmull0, viewProjectionMatrix), viewportMatrix);
+		Vector3 screenCatmull1 = Transform(Transform(catmull1, viewProjectionMatrix), viewportMatrix);
+
+		Novice::DrawLine((int)screenCatmull0.x, (int)screenCatmull0.y, (int)screenCatmull1.x, (int)screenCatmull1.y, color);
+		if (i == 0) {
+			Novice::DrawEllipse(int(screenCatmull0.x), int(screenCatmull0.y), 3, 3, 0.0f, BLACK, kFillModeSolid);
+		}
+		else if (i == kSegmentNum - 1) {
+			Novice::DrawEllipse(int(screenCatmull1.x), int(screenCatmull1.y), 3, 3, 0.0f, BLACK, kFillModeSolid);
 		}
 	}
 }

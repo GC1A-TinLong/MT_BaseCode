@@ -85,6 +85,7 @@ Vector3 Project(const Vector3& v1, const Vector3& v2);
 Vector3 ClosestPoint(const Vector3& point, const Segment& segment);
 Vector3 Lerp(const Vector3& v1, const Vector3& v2, float t);
 Vector3 Bezier(const Vector3& p0, const Vector3& p1, const Vector3& p2, float t);
+Vector3 Catmull(const Vector3& p0, const Vector3& p1, const Vector3& p2, const Vector3& p3, float t);
 
 Matrix4x4 operator+(const Matrix4x4& m1, const Matrix4x4& m2);
 Matrix4x4 operator-(const Matrix4x4& m1, const Matrix4x4& m2);
@@ -111,6 +112,8 @@ void DrawPlane(const Plane& plane, const Matrix4x4& viewProjectionMatrix, const 
 void DrawTriangle(const Triangle& triangle, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
 void DrawAABB(const AABB& aabb, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
 void DrawBezier(const Vector3& p0, const Vector3& p1, const Vector3& p2, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
+void DrawCatmullRom(const Vector3& p0, const Vector3& p1, const Vector3& p2, const Vector3& p3,
+	const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
 
 bool IsCollideSphere(const Sphere& sphere1, const Sphere& sphere2);
 Vector3 Perpendicular(const Vector3& vector);
