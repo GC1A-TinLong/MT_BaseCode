@@ -2,10 +2,10 @@
 
 void CameraControl(char* keys, Vector3& cameraPosition, Vector3& cameraRotate) {
 	if (keys[DIK_Q]) {
-		cameraPosition.y += 0.02f;
+		cameraPosition.y += 0.06f;
 	}
 	if (keys[DIK_E]) {
-		cameraPosition.y -= 0.02f;
+		cameraPosition.y -= 0.06f;
 	}
 	if (keys[DIK_A] && !keys[DIK_LSHIFT]) {
 		cameraPosition.x -= 0.05f;
