@@ -33,6 +33,13 @@ void CameraControl(char* keys, Vector3& cameraPosition, Vector3& cameraRotate) {
 	}
 }
 
+void VectorScreenPrintf(int x, int y, const Vector3& vector, const char* label) {
+	Novice::ScreenPrintf(x, y, "%0.2f", vector.x);
+	Novice::ScreenPrintf(x + kColumnWidth, y, "%0.2f", vector.y);
+	Novice::ScreenPrintf(x + kColumnWidth * 2, y, "%0.2f", vector.z);
+	Novice::ScreenPrintf(x + kColumnWidth * 3, y, "%s", label);
+}
+
 void MatrixScreenPrintf(int x, int y, const Matrix4x4& matrix, const char* label)
 {
 	Novice::ScreenPrintf(x, y, "%s", label);
@@ -41,13 +48,6 @@ void MatrixScreenPrintf(int x, int y, const Matrix4x4& matrix, const char* label
 			Novice::ScreenPrintf(x + column * kColumnWidth, (y + row * kRowHeight) + kRowHeight, "%6.02f", matrix.m[row][column]);
 		}
 	}
-}
-
-void VectorScreenPrintf(int x, int y, const Vector3& vector, const char* label) {
-	Novice::ScreenPrintf(x, y, "%0.2f", vector.x);
-	Novice::ScreenPrintf(x + kColumnWidth, y, "%0.2f", vector.y);
-	Novice::ScreenPrintf(x + kColumnWidth * 2, y, "%0.2f", vector.z);
-	Novice::ScreenPrintf(x + kColumnWidth * 3, y, "%s", label);
 }
 
 Vector2Int operator-(const Vector2Int& v1, const Vector2Int& v2)
@@ -146,6 +146,22 @@ Vector3 Project(const Vector3& v1, const Vector3& v2)
 Vector3 ClosestPoint(const Vector3& point, const Segment& segment)
 {
 	return point + segment.diff;
+}
+
+Vector3 Lerp(const Vector3& v1, const Vector3& v2, float t)
+{
+	return{
+		(t * v1.x + (1.0f - t) * v2.x),
+		(t * v1.y + (1.0f - t) * v2.y),
+		(t * v1.z + (1.0f - t) * v2.z),
+	};
+}
+
+Vector3 Bezier(const Vector3& p0, const Vector3& p1, const Vector3& p2, float t)
+{
+	Vector3 p0p1 = Lerp(p0, p1, t);
+	Vector3 p1p2 = Lerp(p1, p2, t);
+	return Lerp(p0p1, p1p2, t);
 }
 
 Matrix4x4 operator+(const Matrix4x4& m1, const Matrix4x4& m2)
@@ -525,6 +541,29 @@ void DrawAABB(const AABB& aabb, const Matrix4x4& viewProjectionMatrix, const Mat
 	Novice::DrawLine(int(screenTop[3].x), int(screenTop[3].y), int(screenTop[0].x), int(screenTop[0].y), color);
 	for (int i = 0; i < 4; i++) {
 		Novice::DrawLine(int(screenBot[i].x), int(screenBot[i].y), int(screenTop[i].x), int(screenTop[i].y), color);
+	}
+}
+
+void DrawBezier(const Vector3& p0, const Vector3& p1, const Vector3& p2, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color)
+{
+	const int kSegmentNum = 32;
+	for (int i = 0; i < kSegmentNum; i++) {
+		float t0 = i / (float)kSegmentNum;
+		float t1 = (i + 1) / (float)kSegmentNum;
+
+		Vector3 bezier0 = Bezier(p0, p1, p2, t0);
+		Vector3 bezier1 = Bezier(p0, p1, p2, t1);
+
+		Vector3 screenBezier0 = Transform(Transform(bezier0, viewProjectionMatrix), viewportMatrix);
+		Vector3 screenBezier1 = Transform(Transform(bezier1, viewProjectionMatrix), viewportMatrix);
+
+		Novice::DrawLine(int(screenBezier0.x), int(screenBezier0.y), int(screenBezier1.x), int(screenBezier1.y), color);
+		if (i == 0) {
+			Novice::DrawEllipse(int(screenBezier0.x), int(screenBezier0.y), 3, 3, 0.0f, BLACK, kFillModeSolid);
+		}
+		if (i == (kSegmentNum / 2) - 1 || i == kSegmentNum - 1) {
+			Novice::DrawEllipse(int(screenBezier1.x), int(screenBezier1.y), 3, 3, 0.0f, BLACK, kFillModeSolid);
+		}
 	}
 }
 
