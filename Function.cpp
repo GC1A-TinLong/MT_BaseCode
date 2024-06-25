@@ -610,7 +610,8 @@ void StartSpring(const Spring& spring, Ball& ball)
 		Vector3 force = restoringForce + dampingForce;
 		ball.accerleration = force / ball.mass;
 	}
-	ball.velocity += ball.accerleration * deltaTime;
+	const Vector3 gravity = { 0.0f,-9.8f,0.0f };
+	ball.velocity += (ball.accerleration + gravity) * deltaTime;
 	ball.position += ball.velocity * deltaTime;
 }
 
@@ -619,8 +620,8 @@ void DrawSpring(const Spring& spring, Ball& ball, const Matrix4x4& viewProjectio
 	Vector3 diff = ball.position - spring.anchor;
 
 	Vector3 screenAnchor = Transform(Transform(spring.anchor, viewProjectionMatrix), viewportMatrix);
-	Vector3 screenDiff = Transform(Transform(diff, viewProjectionMatrix), viewportMatrix);
-	Novice::DrawLine(int(screenAnchor.x), int(screenAnchor.y), int(screenDiff.x), int(screenDiff.y), WHITE);
+	Vector3 screenBallPos = Transform(Transform(ball.position, viewProjectionMatrix), viewportMatrix);
+	Novice::DrawLine(int(screenAnchor.x), int(screenAnchor.y), int(screenBallPos.x), int(screenBallPos.y), WHITE);
 	DrawSphere({ ball.position,ball.radius }, viewProjectionMatrix, viewportMatrix, ball.color);
 }
 

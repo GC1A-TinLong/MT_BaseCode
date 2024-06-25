@@ -18,14 +18,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Vector3 cameraPosition{ 0.0f,1.9f,-6.49f };
 
 	Spring spring{
-		.anchor{0.0f,0.0f,0.0f},
-		.naturalLength = 1.0f,
+		.anchor{0.0f,1.0f,0.0f},
+		.naturalLength = 0.7f,
 		.stiffness = 100.0f,
 		.dampingCoefficient = 2.0f
 	};
 
 	Ball ball{
-		.position{1.2f,0.0f,0.0f},
+		.position{0.8f,0.2f,0.0f},
 		.mass = 2.0f,
 		.radius = 0.05f,
 		.color = BLUE
@@ -60,12 +60,31 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		CameraControl(keys, cameraPosition, cameraRotate);
 
+		ImGui::Begin("Debug Window");
+
 		if (ImGui::Button("Start")) {
 			start ^= true;
 		}
 		if (start) {
 			StartSpring(spring, ball);
 		}
+
+		if (ImGui::Button("Reset")) {
+			spring = {
+				.anchor{0.0f,1.0f,0.0f},
+				.naturalLength = 0.7f,
+				.stiffness = 100.0f,
+				.dampingCoefficient = 2.0f
+			};
+
+			ball = {
+				.position{0.8f,0.2f,0.0f},
+				.mass = 2.0f,
+				.radius = 0.05f,
+				.color = BLUE
+			};
+		}
+		ImGui::End();
 
 		///
 		/// ↑更新処理ここまで
@@ -78,11 +97,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		DrawGrid(viewProjectionMatrix, viewportMatrix);
 
 		DrawSpring(spring, ball, viewProjectionMatrix, viewportMatrix);
-
-		ImGui::Begin("Debug Window");
-		ImGui::DragFloat3("CameraTranslate", &cameraPosition.x, 0.01f);
-		ImGui::DragFloat3("CameraRotate", &cameraRotate.x, 0.01f);
-		ImGui::End();
 
 		///
 		/// ↑描画処理ここまで
