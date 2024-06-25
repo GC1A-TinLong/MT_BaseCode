@@ -135,17 +135,13 @@ Vector3 Cross(const Vector3& v1, const Vector3& v2)
 
 Vector3 Project(const Vector3& v1, const Vector3& v2)
 {
-	Vector3 normalV2 = Normalize(v2);
-	return {
-		(v1.x * v2.x * normalV2.x) / Length(v2),
-		(v1.y * v2.y * normalV2.y) / Length(v2),
-		(v1.z * v2.z * normalV2.z) / Length(v2),
-	};
+	return Dot(v1, Normalize(v2)) * Normalize(v2);
 }
 
 Vector3 ClosestPoint(const Vector3& point, const Segment& segment)
 {
-	return point + segment.diff;
+	Vector3 project = Project(point - segment.origin, segment.diff);
+	return segment.origin + project;
 }
 
 Vector3 Lerp(const Vector3& v1, const Vector3& v2, float t)
