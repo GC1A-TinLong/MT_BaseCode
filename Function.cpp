@@ -72,6 +72,16 @@ Vector2 Normalize(const Vector2Int& v)
 	};
 }
 
+Vector3 operator+(const Vector3& v)
+{
+	return v;
+}
+
+Vector3 operator-(const Vector3& v)
+{
+	return { -v.x,-v.y,-v.z };
+}
+
 Vector3 operator+(const Vector3& v1, const Vector3& v2)
 {
 	Vector3 result{};
