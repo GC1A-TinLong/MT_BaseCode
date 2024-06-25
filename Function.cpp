@@ -118,9 +118,14 @@ Vector3 operator*(const Vector3& v, float scalar)
 	return result;
 }
 
+Vector3 operator/(float s, const Vector3& v)
+{
+	return v * (1.0f / s);
+}
+
 Vector3 operator/(const Vector3& v, float s)
 {
-	return v * (1.0f / s); 
+	return v * (1.0f / s);
 }
 
 float Dot(const Vector3& v1, const Vector3& v2)
@@ -588,6 +593,36 @@ void DrawBezier(const Vector3& p0, const Vector3& p1, const Vector3& p2, const M
 			Novice::DrawEllipse(int(screenBezier1.x), int(screenBezier1.y), 3, 3, 0.0f, BLACK, kFillModeSolid);
 		}
 	}
+}
+
+void StartSpring(const Spring& spring, Ball& ball)
+{
+	float deltaTime = 1.0f / 60.0f;
+
+	Vector3 diff = ball.position - spring.anchor;
+	float length = Length(diff);
+	if (length != 0) {
+		Vector3 direction = Normalize(diff);
+		Vector3 resetPosition = spring.anchor + direction * spring.naturalLength;
+		Vector3 displacement = length * (ball.position - resetPosition);
+		Vector3 restoringForce = -spring.stiffness * displacement;
+		Vector3 dampingForce = -spring.dampingCoefficient * ball.velocity;
+		Vector3 force = restoringForce + dampingForce;
+		ball.accerleration = force / ball.mass;
+	}
+	const Vector3 gravity = { 0.0f,-9.8f,0.0f };
+	ball.velocity += (ball.accerleration + gravity) * deltaTime;
+	ball.position += ball.velocity * deltaTime;
+}
+
+void DrawSpring(const Spring& spring, Ball& ball, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix)
+{
+	Vector3 diff = ball.position - spring.anchor;
+
+	Vector3 screenAnchor = Transform(Transform(spring.anchor, viewProjectionMatrix), viewportMatrix);
+	Vector3 screenBallPos = Transform(Transform(ball.position, viewProjectionMatrix), viewportMatrix);
+	Novice::DrawLine(int(screenAnchor.x), int(screenAnchor.y), int(screenBallPos.x), int(screenBallPos.y), WHITE);
+	DrawSphere({ ball.position,ball.radius }, viewProjectionMatrix, viewportMatrix, ball.color);
 }
 
 void DrawCatmullRom(const Vector3& p0, const Vector3& p1, const Vector3& p2, const Vector3& p3, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color)
