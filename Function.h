@@ -68,7 +68,7 @@ struct OBB {
 	Vector3 size;
 };
 
-struct String {
+struct Spring {
 	Vector3 anchor;
 	float naturalLength;
 	float stiffness;
