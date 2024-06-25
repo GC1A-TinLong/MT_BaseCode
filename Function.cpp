@@ -91,6 +91,11 @@ Vector3 operator+(const Vector3& v1, const Vector3& v2)
 	return result;
 }
 
+Vector3 operator+(const Vector3& v, const float num)
+{
+	return { v.x + num,v.y + num,v.z + num };
+}
+
 Vector3 operator-(const Vector3& v1, const Vector3& v2)
 {
 	Vector3 result{};
@@ -623,6 +628,31 @@ void DrawSpring(const Spring& spring, Ball& ball, const Matrix4x4& viewProjectio
 	Vector3 screenBallPos = Transform(Transform(ball.position, viewProjectionMatrix), viewportMatrix);
 	Novice::DrawLine(int(screenAnchor.x), int(screenAnchor.y), int(screenBallPos.x), int(screenBallPos.y), WHITE);
 	DrawSphere({ ball.position,ball.radius }, viewProjectionMatrix, viewportMatrix, ball.color);
+}
+
+void StartCircularMotion(const Sphere& sphere, CircularPoint& point)
+{
+	float deltaTime = 1.0f / 60.0f;
+	float angularVelocity = 3.14f;
+	point.angle += angularVelocity * deltaTime;
+
+	point.p = {
+		sphere.center.x + std::cos(point.angle) * point.radiusFromCenter,
+		sphere.center.y + std::sin(point.angle) * point.radiusFromCenter,
+		sphere.center.z,
+	};
+}
+
+void DrawCircularMotion(const Sphere& sphere, CircularPoint& point, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color)
+{
+	if (point.start) {
+		DrawSphere({ point.p,sphere.radius }, viewProjectionMatrix, viewportMatrix, color);
+	}
+	else {
+		Vector3 origin = sphere.center;
+		origin.x = sphere.center.x + point.radiusFromCenter;
+		DrawSphere({ origin,sphere.radius }, viewProjectionMatrix, viewportMatrix, color);
+	}
 }
 
 void DrawCatmullRom(const Vector3& p0, const Vector3& p1, const Vector3& p2, const Vector3& p3, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color)

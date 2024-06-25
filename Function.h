@@ -83,6 +83,13 @@ struct Ball {
 	uint32_t color;
 };
 
+struct CircularPoint {
+	Vector3 p;
+	float angle;
+	float radiusFromCenter;
+	bool start;
+};
+
 void CameraControl(char* keys, Vector3& cameraPosition, Vector3& cameraRotate);
 
 void VectorScreenPrintf(int x, int y, const Vector3& vector, const char* label);
@@ -95,6 +102,7 @@ Vector2 Normalize(const Vector2Int& v);
 Vector3 operator+(const Vector3& v);
 Vector3 operator-(const Vector3& v);
 Vector3 operator+(const Vector3& v1, const Vector3& v2);
+Vector3 operator+(const Vector3& v, const float num);
 Vector3 operator-(const Vector3& v1, const Vector3& v2);
 Vector3 operator*(float scalar, const Vector3& v);
 Vector3 operator*(const Vector3& v, float scalar);
@@ -136,6 +144,8 @@ void DrawAABB(const AABB& aabb, const Matrix4x4& viewProjectionMatrix, const Mat
 void DrawBezier(const Vector3& p0, const Vector3& p1, const Vector3& p2, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
 void StartSpring(const Spring& spring, Ball& ball);
 void DrawSpring(const Spring& spring, Ball& ball, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix);
+void StartCircularMotion(const Sphere& sphere, CircularPoint& point);
+void DrawCircularMotion(const Sphere& sphere, CircularPoint& point, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
 
 bool IsCollideSphere(const Sphere& sphere1, const Sphere& sphere2);
 Vector3 Perpendicular(const Vector3& vector);
