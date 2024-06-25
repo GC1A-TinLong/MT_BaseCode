@@ -17,7 +17,18 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Vector3 cameraRotate{ 0.26f,0,0 };
 	Vector3 cameraPosition{ 0.0f,1.9f,-6.49f };
 
-	Spring spring{};
+	Spring spring{
+		.anchor{0.0f,0.0f,0.0f},
+		.naturalLength = 1.0f,
+		.stiffness = 100.0f
+	};
+
+	Ball ball{
+		.position{1.2f,0.0f,0.0f},
+		.mass = 2.0f,
+		.radius = 0.05f,
+		.color = BLUE
+	};
 
 
 	// キー入力結果を受け取る箱
