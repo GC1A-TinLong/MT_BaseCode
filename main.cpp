@@ -20,7 +20,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Spring spring{
 		.anchor{0.0f,0.0f,0.0f},
 		.naturalLength = 1.0f,
-		.stiffness = 100.0f
+		.stiffness = 100.0f,
+		.dampingCoefficient = 2.0f
 	};
 
 	Ball ball{
@@ -30,6 +31,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		.color = BLUE
 	};
 
+	bool start = false;
 
 	// キー入力結果を受け取る箱
 	char keys[256] = { 0 };
@@ -58,6 +60,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		CameraControl(keys, cameraPosition, cameraRotate);
 
+		if (ImGui::Button("Start")) {
+			start ^= true;
+		}
+		if (start) {
+			StartSpring(spring, ball);
+		}
+
 		///
 		/// ↑更新処理ここまで
 		///
@@ -67,6 +76,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		///
 
 		DrawGrid(viewProjectionMatrix, viewportMatrix);
+
+		DrawSpring(spring, ball, viewProjectionMatrix, viewportMatrix);
 
 		ImGui::Begin("Debug Window");
 		ImGui::DragFloat3("CameraTranslate", &cameraPosition.x, 0.01f);
