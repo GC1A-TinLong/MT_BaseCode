@@ -81,6 +81,7 @@ Vector3 operator+(const Vector3& v1, const Vector3& v2);
 Vector3 operator-(const Vector3& v1, const Vector3& v2);
 Vector3 operator*(float scalar, const Vector3& v);
 Vector3 operator*(const Vector3& v, float scalar);
+Vector3 operator/(const Vector3& v, float s) { return v * (1.0f / s); }
 
 float Dot(const Vector3& v1, const Vector3& v2);
 float Length(const Vector3& v);
