@@ -99,6 +99,15 @@ Vector3 operator*(float scalar, const Vector3& v)
 	return result;
 }
 
+Vector3 operator*(const Vector3& v, float scalar)
+{
+	Vector3 result{};
+	result.x = scalar * v.x;
+	result.y = scalar * v.y;
+	result.z = scalar * v.z;
+	return result;
+}
+
 float Dot(const Vector3& v1, const Vector3& v2)
 {
 	return (v1.x * v2.x + v1.y * v2.y + v1.z * v2.z);
@@ -488,18 +497,18 @@ void DrawAABB(const AABB& aabb, const Matrix4x4& viewProjectionMatrix, const Mat
 	for (int i = 0; i < 4; i++) {
 		bot[i] = aabb.min;
 	}
-	bot[1].z = aabb.max.z;
-	bot[2] = { aabb.max.x, aabb.min.y, aabb.max.z };
-	bot[3].x = aabb.max.x;
+	bot[1].z += aabb.max.z;
+	bot[2] = { aabb.min.x + aabb.max.x, aabb.min.y, aabb.min.z + aabb.max.z };
+	bot[3].x += aabb.max.x;
 
 	Vector3 top[4]{};
 	for (int i = 0; i < 4; i++) {
 		top[i] = aabb.min;
 		top[i].y = aabb.max.y;
 	}
-	top[1].z = aabb.max.z;
-	top[2] = { aabb.max.x,aabb.max.y,aabb.max.z };
-	top[3].x = aabb.max.x;
+	top[1].z += aabb.max.z;
+	top[2] = { aabb.min.x + aabb.max.x,aabb.max.y,aabb.min.z + aabb.max.z };
+	top[3].x += aabb.max.x;
 
 	Vector3 screenBot[4]{};
 	Vector3 screenTop[4]{};
@@ -551,8 +560,9 @@ bool IsCollideLinePlane(const Segment& segment, const Plane& plane)
 	if (dot == 0.0f) { return false; }	// when perpendicular -> never colliding
 
 	float t = (plane.distance - Dot(segment.origin, plane.normal)) / dot;
-	if (t >= 0 && t <= 1.0f) { return true; }
-
+	if (t >= 0 && t <= 1.0f) {
+		return true;
+	}
 	return false;
 }
 
@@ -584,11 +594,112 @@ bool IsCollideTriangleLine(const Triangle& triangle, const Segment& segment)
 
 bool IsCollideAABB(const AABB& a, const AABB& b)
 {
-	if ((a.min.x <= b.max.x && a.max.x >= b.min.x) &&
-		(a.min.y <= b.max.y && a.max.y >= b.min.y) &&
-		(a.min.z <= b.max.z && a.max.z >= b.min.z))
+	if ((a.min.x <= b.min.x + b.max.x && a.min.x + a.max.x >= b.min.x) &&
+		(a.min.y <= b.min.y + b.max.y && a.min.y + a.max.y >= b.min.y) &&
+		(a.min.z <= b.min.z + b.max.z && a.min.z + a.max.z >= b.min.z))
 	{
 		return true;
 	}
 	else { return false; }
+}
+
+bool IsCollideAABBSphere(const AABB& aabb, const Sphere& sphere)
+{
+	Vector3 closestPoint{
+		std::clamp(sphere.center.x,aabb.min.x,aabb.max.x),
+		std::clamp(sphere.center.y,aabb.min.y,aabb.max.y) ,
+		std::clamp(sphere.center.z,aabb.min.z,aabb.max.z) };
+	float distance = Length(closestPoint - sphere.center);
+
+	if (distance <= sphere.radius) {
+		return true;
+	}
+	return false;
+}
+
+bool IsCollideAABBSegment(const AABB& aabb, const Segment& segment)
+{
+	float txMin = (aabb.min.x - segment.origin.x) / segment.diff.x;
+	float txMax = (aabb.min.x + aabb.max.x - segment.origin.x) / segment.diff.x;
+	float tyMin = (aabb.min.y - segment.origin.y) / segment.diff.y;
+	float tyMax = (aabb.min.y + aabb.max.y - segment.origin.y) / segment.diff.y;
+	float tzMin = (aabb.min.z - segment.origin.z) / segment.diff.z;
+	float tzMax = (aabb.min.z + aabb.max.z - segment.origin.z) / segment.diff.z;
+
+	float tNearX = min(txMin, txMax);
+	float tNearY = min(tyMin, tyMax);
+	float tNearZ = min(tzMin, tzMax);
+	float tFarX = max(txMin, txMax);
+	float tFarY = max(tyMin, tyMax);
+	float tFarZ = max(tzMin, tzMax);
+
+	// setting it to infinite for however small/big it is, it still able to track down the number (closest/furthest)
+	float tmin = -std::numeric_limits<float>::infinity();
+	float tmax = +std::numeric_limits<float>::infinity();
+
+	if (segment.diff.x != 0) {
+		tmin = max(tmin, tNearX);
+		tmax = min(tmax, tFarX);
+	}
+	else {
+		if (segment.origin.x<aabb.min.x || segment.origin.x>aabb.min.x + aabb.max.x) {
+			return false;
+		}
+	}
+	if (segment.diff.y != 0) {
+		tmin = max(tmin, tNearY);
+		tmax = min(tmax, tFarY);
+	}
+	else {
+		if (segment.origin.y<aabb.min.y || segment.origin.y>aabb.min.y + aabb.max.y) {
+			return false;
+		}
+	}
+	if (segment.diff.z != 0) {
+		tmin = max(tmin, tNearZ);
+		tmax = min(tmax, tFarZ);
+	}
+	else {
+		if (segment.origin.z<aabb.min.z || segment.origin.z>aabb.min.z + aabb.max.z) {
+			return false;
+		}
+	}
+
+	return tmin <= tmax && tmax >= 0;
+}
+
+bool IsCollideOBBSphere(OBB& obb, const Sphere& sphere, Matrix4x4& rotateMatrix)
+{
+	obb.orientations[0].x = rotateMatrix.m[0][0];
+	obb.orientations[0].y = rotateMatrix.m[0][1];
+	obb.orientations[0].z = rotateMatrix.m[0][2];
+
+	obb.orientations[1].x = rotateMatrix.m[1][0];
+	obb.orientations[1].y = rotateMatrix.m[1][1];
+	obb.orientations[1].z = rotateMatrix.m[1][2];
+
+	obb.orientations[2].x = rotateMatrix.m[2][0];
+	obb.orientations[2].y = rotateMatrix.m[2][1];
+	obb.orientations[2].z = rotateMatrix.m[2][2];
+
+	Matrix4x4 obbWorldMatrix = {
+		obb.orientations[0].x,obb.orientations[0].y,obb.orientations[0].z,0,
+		obb.orientations[1].x,obb.orientations[1].y,obb.orientations[1].z,0,
+		obb.orientations[2].x,obb.orientations[2].y,obb.orientations[2].z,0,
+		0,0,0,1.0f
+	};
+	Matrix4x4 inverseObbWorldMatrix = Transpose(obbWorldMatrix);
+
+	Vector3 centerInObbLocalSpace = Transform(sphere.center, inverseObbWorldMatrix);
+
+	AABB aabbObbLocal = {
+		obb.size * -1.0f,
+		aabbObbLocal.min + obb.size
+	};
+	Sphere sphereObbLocal = {
+		centerInObbLocalSpace,
+		sphere.radius
+	};
+
+	return IsCollideAABBSphere(aabbObbLocal, sphereObbLocal);
 }

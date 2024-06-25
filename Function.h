@@ -6,6 +6,7 @@
 #include <math.h>
 #include <iostream>
 #include <imgui.h>
+#include <algorithm>
 
 static const int kRowHeight = 20;
 static const int kColumnWidth = 60;
@@ -56,6 +57,12 @@ struct AABB {
 	Vector3 max;
 };
 
+struct OBB {
+	Vector3 center;
+	Vector3 orientations[3];
+	Vector3 size;
+};
+
 void CameraControl(char* keys, Vector3& cameraPosition, Vector3& cameraRotate);
 
 void VectorScreenPrintf(int x, int y, const Vector3& vector, const char* label);
@@ -67,6 +74,7 @@ Vector2 Normalize(const Vector2Int& v);
 Vector3 operator+(const Vector3& v1, const Vector3& v2);
 Vector3 operator-(const Vector3& v1, const Vector3& v2);
 Vector3 operator*(float scalar, const Vector3& v);
+Vector3 operator*(const Vector3& v, float scalar);
 
 float Dot(const Vector3& v1, const Vector3& v2);
 float Length(const Vector3& v);
@@ -108,3 +116,6 @@ bool IsCollideSpherePlane(const Sphere& sphere, const Plane& plane);
 bool IsCollideLinePlane(const Segment& segment, const Plane& plane);
 bool IsCollideTriangleLine(const Triangle& triangle, const Segment& segment);
 bool IsCollideAABB(const AABB& a, const AABB& b);
+bool IsCollideAABBSphere(const AABB& aabb, const Sphere& sphere);
+bool IsCollideAABBSegment(const AABB& aabb, const Segment& segment);
+bool IsCollideOBBSphere(OBB& obb, const Sphere& sphere, Matrix4x4& rotateMatrix);
