@@ -66,6 +66,7 @@ struct OBB {
 void CameraControl(char* keys, Vector3& cameraPosition, Vector3& cameraRotate);
 
 void VectorScreenPrintf(int x, int y, const Vector3& vector, const char* label);
+void MatrixScreenPrintf(int x, int y, const Matrix4x4& matrix, const char* label);
 
 Vector2Int operator-(const Vector2Int& v1, const Vector2Int& v2);
 float Length(const Vector2Int& v);
@@ -82,8 +83,8 @@ Vector3 Normalize(const Vector3& v);
 Vector3 Cross(const Vector3& v1, const Vector3& v2);
 Vector3 Project(const Vector3& v1, const Vector3& v2);
 Vector3 ClosestPoint(const Vector3& point, const Segment& segment);
-
-void MatrixScreenPrintf(int x, int y, const Matrix4x4& matrix, const char* label);
+Vector3 Lerp(const Vector3& v1, const Vector3& v2, float t);
+Vector3 Bezier(const Vector3& p0, const Vector3& p1, const Vector3& p2, float t);
 
 Matrix4x4 operator+(const Matrix4x4& m1, const Matrix4x4& m2);
 Matrix4x4 operator-(const Matrix4x4& m1, const Matrix4x4& m2);
@@ -109,6 +110,7 @@ void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, con
 void DrawPlane(const Plane& plane, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
 void DrawTriangle(const Triangle& triangle, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
 void DrawAABB(const AABB& aabb, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
+void DrawBezier(const Vector3& p0, const Vector3& p1, const Vector3& p2, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
 
 bool IsCollideSphere(const Sphere& sphere1, const Sphere& sphere2);
 Vector3 Perpendicular(const Vector3& vector);
