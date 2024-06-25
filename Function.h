@@ -68,6 +68,20 @@ struct OBB {
 	Vector3 size;
 };
 
+struct String {
+	Vector3 anchor;
+	float naturalLength;
+	float stiffness;
+};
+struct Ball {
+	Vector3 position;
+	Vector3 velocity;
+	Vector3 accerleration;
+	float mass;
+	float radius;
+	uint32_t color;
+};
+
 void CameraControl(char* keys, Vector3& cameraPosition, Vector3& cameraRotate);
 
 void VectorScreenPrintf(int x, int y, const Vector3& vector, const char* label);
