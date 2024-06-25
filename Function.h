@@ -19,6 +19,11 @@ struct Vector2 {
 };
 struct Vector3 {
 	float x, y, z;
+
+	Vector3& operator+=(const Vector3& v) { x += v.x; y += v.y; z += v.z; return *this; }
+	Vector3& operator-=(const Vector3& v) { x -= v.x; y -= v.y; z -= v.z; return *this; }
+	Vector3& operator*=(float s) { x *= s; y *= s; z *= s; return*this; }
+	Vector3& operator/=(float s) { x /= s; y /= s; z /= s; return*this; }
 };
 
 struct Matrix4x4 {
