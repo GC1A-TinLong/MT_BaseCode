@@ -30,6 +30,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		.color = WHITE,
 	};
 
+	Capsule capsule{
+		.segment{{0,0,0},{1.0f,1.0f,1.0f}},
+		.radius = 0.05f,
+	};
+
 	bool start = false;
 
 	// キー入力結果を受け取る箱
@@ -77,7 +82,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		plane.normal = Normalize(plane.normal);
 
 		if (start) {
-			StartReflection(plane, ball);
+			StartReflection(plane, ball, capsule);
 		}
 
 		///

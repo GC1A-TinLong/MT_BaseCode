@@ -751,17 +751,30 @@ void DrawConicalPendulum(const ConicalPendulum& conicalPendulum, const Vector3& 
 	DrawSphere({ center,0.05f }, viewProjectionMatrix, viewportMatrix, color);
 }
 
-void StartReflection(const Plane& plane, Ball& ball)
+void StartReflection(const Plane& plane, Ball& ball, const Capsule& capsule)
 {
-	const float e = 0.8f;	// Coefficient of restitution
+	const float e_ = 0.8f;	// Coefficient of restitution
 
 	ball.velocity += ball.accerleration * deltaTime;
 	ball.position += ball.velocity * deltaTime;
+
 	if (IsCollideSpherePlane(Sphere{ ball.position,ball.radius }, plane)) {
 		Vector3 reflected = ReflectVector(ball.velocity, plane.normal);
 		Vector3 projectToNormal = Project(reflected, plane.normal);
 		Vector3 movingDirection = reflected - projectToNormal;
-		ball.velocity = projectToNormal * e + movingDirection;
+		ball.velocity = projectToNormal * e_ + movingDirection;
+	}
+
+	if (IsCollideCapsuleSphere(capsule, { ball.position,ball.radius })) {
+		Vector3 d = ball.position - capsule.segment.origin;
+		Vector3 e = Normalize(capsule.segment.diff);
+
+		float t = Dot(d, e) / Length(capsule.segment.diff);
+		t = std::clamp(t, 0.0f, 1.0f);
+		Vector3 f = (1.0f - t) * capsule.segment.origin + t + capsule.segment.diff;
+		Vector3 penetrationDepth = f - ball.position;
+
+		ball.position += Normalize(penetrationDepth) * (capsule.radius + ball.radius - Length(penetrationDepth));
 	}
 }
 
@@ -939,4 +952,18 @@ bool IsCollideOBBSphere(OBB& obb, const Sphere& sphere, Matrix4x4& rotateMatrix)
 	};
 
 	return IsCollideAABBSphere(aabbObbLocal, sphereObbLocal);
+}
+
+bool IsCollideCapsuleSphere(const Capsule& capsule, const Sphere& sphere)
+{
+	Vector3 d = sphere.center - capsule.segment.origin;
+	Vector3 e = Normalize(capsule.segment.diff);
+
+	float t = Dot(d, e) / Length(capsule.segment.diff);
+	t = std::clamp(t, 0.0f, 1.0f);
+
+	Vector3 f = (1.0f - t) * capsule.segment.origin + t * capsule.segment.diff;
+	float distance = Length(sphere.center - f);
+
+	return distance <= sphere.radius + capsule.radius;
 }
