@@ -17,6 +17,21 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Vector3 cameraRotate{ 0.26f,0,0 };
 	Vector3 cameraPosition{ 0.0f,1.9f,-6.49f };
 
+	Plane plane{
+		.normal = Normalize({-0.2f,1.2f,-0.3f}),
+		.distance = 0,
+	};
+
+	Ball ball{
+		.position{0.8f,1.2f,0.3f},
+		.accerleration{0,-9.8f,0},
+		.mass = 2.0f,
+		.radius = 0.05f,
+		.color = WHITE,
+	};
+
+	bool start = false;
+
 	// キー入力結果を受け取る箱
 	char keys[256] = { 0 };
 	char preKeys[256] = { 0 };
@@ -44,6 +59,27 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		CameraControl(keys, cameraPosition, cameraRotate);
 
+		ImGui::Begin("Debug Window");
+		if (ImGui::Button("Start")) {
+			start ^= true;
+		}
+		if (ImGui::Button("Reset")) {
+			ball.position = { 0.8f,1.2f,0.3f };
+			ball.velocity = {};
+			start = false;
+		}
+		if (ImGui::Button("Reset Camera")) {
+			cameraPosition = { 0.0f,1.9f,-6.49f };
+		}
+		ImGui::DragFloat3("plane.normal", &plane.normal.x, 0.01f);
+		ImGui::DragFloat("plane.distance", &plane.distance, 0.01f);
+		ImGui::End();
+		plane.normal = Normalize(plane.normal);
+
+		if (start) {
+			StartReflection(plane, ball);
+		}
+
 		///
 		/// ↑更新処理ここまで
 		///
@@ -54,10 +90,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		DrawGrid(viewProjectionMatrix, viewportMatrix);
 
-		ImGui::Begin("Debug Window");
-		ImGui::DragFloat3("CameraTranslate", &cameraPosition.x, 0.01f);
-		ImGui::DragFloat3("CameraRotate", &cameraRotate.x, 0.01f);
-		ImGui::End();
+		DrawPlane(plane, viewProjectionMatrix, viewportMatrix, WHITE);
+		DrawSphere({ ball.position,ball.radius }, viewProjectionMatrix, viewportMatrix, ball.color);
 
 		///
 		/// ↑描画処理ここまで

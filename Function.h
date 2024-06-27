@@ -135,6 +135,7 @@ Vector3 Project(const Vector3& v1, const Vector3& v2);
 Vector3 ClosestPoint(const Vector3& point, const Segment& segment);
 Vector3 Lerp(const Vector3& v1, const Vector3& v2, float t);
 Vector3 Bezier(const Vector3& p0, const Vector3& p1, const Vector3& p2, float t);
+Vector3 ReflectVector(const Vector3& input, const Vector3& normal);
 
 Matrix4x4 operator+(const Matrix4x4& m1, const Matrix4x4& m2);
 Matrix4x4 operator-(const Matrix4x4& m1, const Matrix4x4& m2);
@@ -169,6 +170,7 @@ void StartPendulumMotion(Pendulum& pendulum, Vector3& center);
 void DrawPendulum(const Pendulum& pendulum, const Vector3& center, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
 void StartConicalPendulumMotion(ConicalPendulum& conicalPendulum, Vector3& center);
 void DrawConicalPendulum(const ConicalPendulum& conicalPendulum, const Vector3& center, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
+void StartReflection(const Plane& plane, Ball& ball);
 
 bool IsCollideSphere(const Sphere& sphere1, const Sphere& sphere2);
 Vector3 Perpendicular(const Vector3& vector);

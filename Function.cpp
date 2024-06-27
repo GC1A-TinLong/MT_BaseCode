@@ -185,6 +185,11 @@ Vector3 Bezier(const Vector3& p0, const Vector3& p1, const Vector3& p2, float t)
 	return Lerp(p0p1, p1p2, t);
 }
 
+Vector3 ReflectVector(const Vector3& input, const Vector3& normal)
+{
+	return input - 2.0f * Dot(input, normal) * normal;
+}
+
 Vector3 Catmull(const Vector3& p0, const Vector3& p1, const Vector3& p2, const Vector3& p3, float t)
 {
 	Vector3 result{};
@@ -744,6 +749,20 @@ void DrawConicalPendulum(const ConicalPendulum& conicalPendulum, const Vector3& 
 
 	Novice::DrawLine(int(screenAnchor.x), int(screenAnchor.y), int(screenCenter.x), int(screenCenter.y), WHITE);
 	DrawSphere({ center,0.05f }, viewProjectionMatrix, viewportMatrix, color);
+}
+
+void StartReflection(const Plane& plane, Ball& ball)
+{
+	const float e = 0.8f;	// Coefficient of restitution
+
+	ball.velocity += ball.accerleration * deltaTime;
+	ball.position += ball.velocity * deltaTime;
+	if (IsCollideSpherePlane(Sphere{ ball.position,ball.radius }, plane)) {
+		Vector3 reflected = ReflectVector(ball.velocity, plane.normal);
+		Vector3 projectToNormal = Project(reflected, plane.normal);
+		Vector3 movingDirection = reflected - projectToNormal;
+		ball.velocity = projectToNormal * e + movingDirection;
+	}
 }
 
 bool IsCollideSphere(const Sphere& sphere1, const Sphere& sphere2)
