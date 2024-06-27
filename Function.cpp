@@ -655,6 +655,15 @@ void DrawCircularMotion(const Sphere& sphere, CircularPoint& point, const Matrix
 	}
 }
 
+void DrawPendulum(const Pendulum& pendulum, const Vector3& center, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color)
+{
+	Vector3 screenAnchor = Transform(Transform(pendulum.anchor, viewProjectionMatrix), viewportMatrix);
+	Vector3 screenCenter = Transform(Transform(center, viewProjectionMatrix), viewportMatrix);
+
+	Novice::DrawLine(int(screenAnchor.x), int(screenAnchor.y), int(screenCenter.x), int(screenCenter.y), WHITE);
+	DrawSphere({ center,0.1f }, viewProjectionMatrix, viewportMatrix, color);
+}
+
 void DrawCatmullRom(const Vector3& p0, const Vector3& p1, const Vector3& p2, const Vector3& p3, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color)
 {
 	const int kSegmentNum = 16;

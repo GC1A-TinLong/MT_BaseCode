@@ -17,6 +17,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Vector3 cameraRotate{ 0.26f,0,0 };
 	Vector3 cameraPosition{ 0.0f,1.9f,-6.49f };
 
+	const float deltaTime = 1.0f / 60.0f;
+
+	Pendulum pendulum{
+		.anchor{0,1.5f,0},
+		.length = 0.8f,
+		.angle = 0.7f,
+		.angularVelocity = 0,
+		.angularAcceration = 0,
+	};
+	Vector3 center{};
+
 	// キー入力結果を受け取る箱
 	char keys[256] = { 0 };
 	char preKeys[256] = { 0 };
@@ -44,6 +55,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		CameraControl(keys, cameraPosition, cameraRotate);
 
+		pendulum.angularAcceration = -(9.8f / pendulum.length) * std::sin(pendulum.angle);
+		pendulum.angularVelocity += pendulum.angularAcceration * deltaTime;
+		pendulum.angle += pendulum.angularVelocity * deltaTime;
+
+		center.x = pendulum.anchor.x + std::sin(pendulum.angle) * pendulum.length;
+		center.y = pendulum.anchor.y - std::cos(pendulum.angle) * pendulum.length;
+		center.z = pendulum.anchor.z;
+
 		///
 		/// ↑更新処理ここまで
 		///
@@ -54,9 +73,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		DrawGrid(viewProjectionMatrix, viewportMatrix);
 
+		DrawPendulum(pendulum, center, viewProjectionMatrix, viewportMatrix, BLUE);
+
 		ImGui::Begin("Debug Window");
-		ImGui::DragFloat3("CameraTranslate", &cameraPosition.x, 0.01f);
-		ImGui::DragFloat3("CameraRotate", &cameraRotate.x, 0.01f);
+		ImGui::Button("Start")
 		ImGui::End();
 
 		///
