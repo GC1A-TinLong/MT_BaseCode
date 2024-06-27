@@ -11,6 +11,8 @@
 static const int kRowHeight = 20;
 static const int kColumnWidth = 60;
 
+static inline const float deltaTime = 1.0f / 60.0f;
+
 struct Vector2Int {
 	int x, y;
 };
@@ -98,6 +100,14 @@ struct Pendulum {
 	float angularAcceration;
 };
 
+struct ConicalPendulum {
+	Vector3 anchor;
+	float length;
+	float halfApexAngle;
+	float angle;
+	float angularVelocity;
+};
+
 void CameraControl(char* keys, Vector3& cameraPosition, Vector3& cameraRotate);
 
 void VectorScreenPrintf(int x, int y, const Vector3& vector, const char* label);
@@ -157,6 +167,8 @@ void StartCircularMotion(const Sphere& sphere, CircularPoint& point);
 void DrawCircularMotion(const Sphere& sphere, CircularPoint& point, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
 void StartPendulumMotion(Pendulum& pendulum, Vector3& center);
 void DrawPendulum(const Pendulum& pendulum, const Vector3& center, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
+void StartConicalPendulumMotion(ConicalPendulum& conicalPendulum, Vector3& center);
+void DrawConicalPendulum(const ConicalPendulum& conicalPendulum, const Vector3& center, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
 
 bool IsCollideSphere(const Sphere& sphere1, const Sphere& sphere2);
 Vector3 Perpendicular(const Vector3& vector);

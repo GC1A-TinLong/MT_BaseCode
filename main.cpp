@@ -17,6 +17,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Vector3 cameraRotate{ 0.26f,0,0 };
 	Vector3 cameraPosition{ 0.0f,1.9f,-6.49f };
 
+	ConicalPendulum conicalPendulum{
+		.anchor{0,1.0f,0},
+		.length = 1.0f,
+		.halfApexAngle = 0.7f,
+		.angle = 0,
+		.angularVelocity = 0,
+	};
+	Vector3 center{};
+
+	bool start = false;
+
 	// キー入力結果を受け取る箱
 	char keys[256] = { 0 };
 	char preKeys[256] = { 0 };
@@ -44,6 +55,27 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		CameraControl(keys, cameraPosition, cameraRotate);
 
+		ImGui::Begin("Debug Window");
+		if (ImGui::Button("Start")) {
+			start ^= true;
+		}
+		ImGui::DragFloat("Length", &conicalPendulum.length, 0.01f);
+		ImGui::DragFloat("HalfApexAngle", &conicalPendulum.halfApexAngle, 0.01f);
+		ImGui::InputFloat3("Center", &center.x,"%.3f",ImGuiInputTextFlags_ReadOnly);
+		ImGui::End();
+
+		float radius = std::sin(conicalPendulum.halfApexAngle) * conicalPendulum.length;
+		float height = std::cos(conicalPendulum.halfApexAngle) * conicalPendulum.length;
+		center.x = conicalPendulum.anchor.x + std::cos(conicalPendulum.angle) * radius;
+		center.y = conicalPendulum.anchor.y - height;
+		center.z = conicalPendulum.anchor.z + std::sin(conicalPendulum.angle) * radius;
+
+		conicalPendulum.length = std::clamp(conicalPendulum.length, 0.1f, std::numeric_limits<float>::infinity());
+		conicalPendulum.halfApexAngle = std::clamp(conicalPendulum.halfApexAngle, -1.57f, 1.57f);
+		if (start) {
+			StartConicalPendulumMotion(conicalPendulum, center);
+		}
+
 		///
 		/// ↑更新処理ここまで
 		///
@@ -54,10 +86,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		DrawGrid(viewProjectionMatrix, viewportMatrix);
 
-		ImGui::Begin("Debug Window");
-		ImGui::DragFloat3("CameraTranslate", &cameraPosition.x, 0.01f);
-		ImGui::DragFloat3("CameraRotate", &cameraRotate.x, 0.01f);
-		ImGui::End();
+		DrawConicalPendulum(conicalPendulum, center, viewProjectionMatrix, viewportMatrix, BLUE);
 
 		///
 		/// ↑描画処理ここまで

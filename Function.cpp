@@ -655,7 +655,6 @@ void DrawCatmullRom(const Vector3& p0, const Vector3& p1, const Vector3& p2, con
 
 void StartSpring(const Spring& spring, Ball& ball)
 {
-	float deltaTime = 1.0f / 60.0f;
 
 	Vector3 diff = ball.position - spring.anchor;
 	float length = Length(diff);
@@ -685,7 +684,6 @@ void DrawSpring(const Spring& spring, Ball& ball, const Matrix4x4& viewProjectio
 
 void StartCircularMotion(const Sphere& sphere, CircularPoint& point)
 {
-	float deltaTime = 1.0f / 60.0f;
 	float angularVelocity = 3.14f;
 	point.angle += angularVelocity * deltaTime;
 
@@ -710,7 +708,6 @@ void DrawCircularMotion(const Sphere& sphere, CircularPoint& point, const Matrix
 
 void StartPendulumMotion(Pendulum& pendulum, Vector3& center)
 {
-	const float deltaTime = 1.0f / 60.0f;
 	pendulum.angularAcceration = -(9.8f / pendulum.length) * std::sin(pendulum.angle);
 	pendulum.angularVelocity += pendulum.angularAcceration * deltaTime;
 	pendulum.angle += pendulum.angularVelocity * deltaTime;
@@ -728,6 +725,27 @@ void DrawPendulum(const Pendulum& pendulum, const Vector3& center, const Matrix4
 
 	Novice::DrawLine(int(screenAnchor.x), int(screenAnchor.y), int(screenCenter.x), int(screenCenter.y), WHITE);
 	DrawSphere({ center,0.1f }, viewProjectionMatrix, viewportMatrix, color);
+}
+
+void StartConicalPendulumMotion(ConicalPendulum& conicalPendulum, Vector3& center)
+{
+	conicalPendulum.angularVelocity = std::sqrt(9.8f / (conicalPendulum.length * std::cos(conicalPendulum.halfApexAngle)));
+	conicalPendulum.angle += conicalPendulum.angularVelocity * deltaTime;
+
+	float radius = std::sin(conicalPendulum.halfApexAngle) * conicalPendulum.length;
+	float height = std::cos(conicalPendulum.halfApexAngle) * conicalPendulum.length;
+	center.x = conicalPendulum.anchor.x + std::cos(conicalPendulum.angle) * radius;
+	center.y = conicalPendulum.anchor.y - height;
+	center.z = conicalPendulum.anchor.z + std::sin(conicalPendulum.angle) * radius;
+}
+
+void DrawConicalPendulum(const ConicalPendulum& conicalPendulum, const Vector3& center, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color)
+{
+	Vector3 screenAnchor = Transform(Transform(conicalPendulum.anchor, viewProjectionMatrix), viewportMatrix);
+	Vector3 screenCenter = Transform(Transform(center, viewProjectionMatrix), viewportMatrix);
+
+	Novice::DrawLine(int(screenAnchor.x), int(screenAnchor.y), int(screenCenter.x), int(screenCenter.y), WHITE);
+	DrawSphere({ center,0.05f }, viewProjectionMatrix, viewportMatrix, color);
 }
 
 bool IsCollideSphere(const Sphere& sphere1, const Sphere& sphere2)
