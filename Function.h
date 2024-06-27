@@ -150,10 +150,12 @@ void DrawPlane(const Plane& plane, const Matrix4x4& viewProjectionMatrix, const 
 void DrawTriangle(const Triangle& triangle, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
 void DrawAABB(const AABB& aabb, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
 void DrawBezier(const Vector3& p0, const Vector3& p1, const Vector3& p2, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
+void DrawCatmullRom(const Vector3& p0, const Vector3& p1, const Vector3& p2, const Vector3& p3, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
 void StartSpring(const Spring& spring, Ball& ball);
 void DrawSpring(const Spring& spring, Ball& ball, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix);
 void StartCircularMotion(const Sphere& sphere, CircularPoint& point);
 void DrawCircularMotion(const Sphere& sphere, CircularPoint& point, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
+void StartPendulumMotion(Pendulum& pendulum, Vector3& center);
 void DrawPendulum(const Pendulum& pendulum, const Vector3& center, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
 
 bool IsCollideSphere(const Sphere& sphere1, const Sphere& sphere2);

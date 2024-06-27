@@ -600,6 +600,59 @@ void DrawBezier(const Vector3& p0, const Vector3& p1, const Vector3& p2, const M
 	}
 }
 
+void DrawCatmullRom(const Vector3& p0, const Vector3& p1, const Vector3& p2, const Vector3& p3, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color)
+{
+	const int kSegmentNum = 16;
+	for (int i = 0; i < kSegmentNum; i++) {
+		float t0 = i / (float)kSegmentNum;
+		float t1 = (i + 1) / (float)kSegmentNum;
+
+		Vector3 catmull0 = Catmull(p0, p0, p1, p2, t0);
+		Vector3 catmull1 = Catmull(p0, p0, p1, p2, t1);
+
+		Vector3 screenCatmull0 = Transform(Transform(catmull0, viewProjectionMatrix), viewportMatrix);
+		Vector3 screenCatmull1 = Transform(Transform(catmull1, viewProjectionMatrix), viewportMatrix);
+
+		Novice::DrawLine((int)screenCatmull0.x, (int)screenCatmull0.y, (int)screenCatmull1.x, (int)screenCatmull1.y, color);
+		if (i == 0) {
+			Novice::DrawEllipse(int(screenCatmull0.x), int(screenCatmull0.y), 3, 3, 0.0f, BLACK, kFillModeSolid);
+		}
+	}
+	for (int i = 0; i < kSegmentNum; i++) {
+		float t0 = i / (float)kSegmentNum;
+		float t1 = (i + 1) / (float)kSegmentNum;
+
+		Vector3 catmull0 = Catmull(p0, p1, p2, p3, t0);
+		Vector3 catmull1 = Catmull(p0, p1, p2, p3, t1);
+
+		Vector3 screenCatmull0 = Transform(Transform(catmull0, viewProjectionMatrix), viewportMatrix);
+		Vector3 screenCatmull1 = Transform(Transform(catmull1, viewProjectionMatrix), viewportMatrix);
+
+		Novice::DrawLine((int)screenCatmull0.x, (int)screenCatmull0.y, (int)screenCatmull1.x, (int)screenCatmull1.y, color);
+		if (i == 0) {
+			Novice::DrawEllipse(int(screenCatmull0.x), int(screenCatmull0.y), 3, 3, 0.0f, BLACK, kFillModeSolid);
+		}
+	}
+	for (int i = 0; i < kSegmentNum; i++) {
+		float t0 = i / (float)kSegmentNum;
+		float t1 = (i + 1) / (float)kSegmentNum;
+
+		Vector3 catmull0 = Catmull(p1, p2, p3, p3, t0);
+		Vector3 catmull1 = Catmull(p1, p2, p3, p3, t1);
+
+		Vector3 screenCatmull0 = Transform(Transform(catmull0, viewProjectionMatrix), viewportMatrix);
+		Vector3 screenCatmull1 = Transform(Transform(catmull1, viewProjectionMatrix), viewportMatrix);
+
+		Novice::DrawLine((int)screenCatmull0.x, (int)screenCatmull0.y, (int)screenCatmull1.x, (int)screenCatmull1.y, color);
+		if (i == 0) {
+			Novice::DrawEllipse(int(screenCatmull0.x), int(screenCatmull0.y), 3, 3, 0.0f, BLACK, kFillModeSolid);
+		}
+		else if (i == kSegmentNum - 1) {
+			Novice::DrawEllipse(int(screenCatmull1.x), int(screenCatmull1.y), 3, 3, 0.0f, BLACK, kFillModeSolid);
+		}
+	}
+}
+
 void StartSpring(const Spring& spring, Ball& ball)
 {
 	float deltaTime = 1.0f / 60.0f;
@@ -655,6 +708,19 @@ void DrawCircularMotion(const Sphere& sphere, CircularPoint& point, const Matrix
 	}
 }
 
+void StartPendulumMotion(Pendulum& pendulum, Vector3& center)
+{
+	const float deltaTime = 1.0f / 60.0f;
+	pendulum.angularAcceration = -(9.8f / pendulum.length) * std::sin(pendulum.angle);
+	pendulum.angularVelocity += pendulum.angularAcceration * deltaTime;
+	pendulum.angle += pendulum.angularVelocity * deltaTime;
+
+	center.x = pendulum.anchor.x + std::sin(pendulum.angle) * pendulum.length;
+	center.y = pendulum.anchor.y - std::cos(pendulum.angle) * pendulum.length;
+	center.z = pendulum.anchor.z;
+}
+
+
 void DrawPendulum(const Pendulum& pendulum, const Vector3& center, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color)
 {
 	Vector3 screenAnchor = Transform(Transform(pendulum.anchor, viewProjectionMatrix), viewportMatrix);
@@ -662,59 +728,6 @@ void DrawPendulum(const Pendulum& pendulum, const Vector3& center, const Matrix4
 
 	Novice::DrawLine(int(screenAnchor.x), int(screenAnchor.y), int(screenCenter.x), int(screenCenter.y), WHITE);
 	DrawSphere({ center,0.1f }, viewProjectionMatrix, viewportMatrix, color);
-}
-
-void DrawCatmullRom(const Vector3& p0, const Vector3& p1, const Vector3& p2, const Vector3& p3, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color)
-{
-	const int kSegmentNum = 16;
-	for (int i = 0; i < kSegmentNum; i++) {
-		float t0 = i / (float)kSegmentNum;
-		float t1 = (i + 1) / (float)kSegmentNum;
-
-		Vector3 catmull0 = Catmull(p0, p0, p1, p2, t0);
-		Vector3 catmull1 = Catmull(p0, p0, p1, p2, t1);
-
-		Vector3 screenCatmull0 = Transform(Transform(catmull0, viewProjectionMatrix), viewportMatrix);
-		Vector3 screenCatmull1 = Transform(Transform(catmull1, viewProjectionMatrix), viewportMatrix);
-
-		Novice::DrawLine((int)screenCatmull0.x, (int)screenCatmull0.y, (int)screenCatmull1.x, (int)screenCatmull1.y, color);
-		if (i == 0) {
-			Novice::DrawEllipse(int(screenCatmull0.x), int(screenCatmull0.y), 3, 3, 0.0f, BLACK, kFillModeSolid);
-		}
-	}
-	for (int i = 0; i < kSegmentNum; i++) {
-		float t0 = i / (float)kSegmentNum;
-		float t1 = (i + 1) / (float)kSegmentNum;
-
-		Vector3 catmull0 = Catmull(p0, p1, p2, p3, t0);
-		Vector3 catmull1 = Catmull(p0, p1, p2, p3, t1);
-
-		Vector3 screenCatmull0 = Transform(Transform(catmull0, viewProjectionMatrix), viewportMatrix);
-		Vector3 screenCatmull1 = Transform(Transform(catmull1, viewProjectionMatrix), viewportMatrix);
-
-		Novice::DrawLine((int)screenCatmull0.x, (int)screenCatmull0.y, (int)screenCatmull1.x, (int)screenCatmull1.y, color);
-		if (i == 0) {
-			Novice::DrawEllipse(int(screenCatmull0.x), int(screenCatmull0.y), 3, 3, 0.0f, BLACK, kFillModeSolid);
-		}
-	}
-	for (int i = 0; i < kSegmentNum; i++) {
-		float t0 = i / (float)kSegmentNum;
-		float t1 = (i + 1) / (float)kSegmentNum;
-
-		Vector3 catmull0 = Catmull(p1, p2, p3, p3, t0);
-		Vector3 catmull1 = Catmull(p1, p2, p3, p3, t1);
-
-		Vector3 screenCatmull0 = Transform(Transform(catmull0, viewProjectionMatrix), viewportMatrix);
-		Vector3 screenCatmull1 = Transform(Transform(catmull1, viewProjectionMatrix), viewportMatrix);
-
-		Novice::DrawLine((int)screenCatmull0.x, (int)screenCatmull0.y, (int)screenCatmull1.x, (int)screenCatmull1.y, color);
-		if (i == 0) {
-			Novice::DrawEllipse(int(screenCatmull0.x), int(screenCatmull0.y), 3, 3, 0.0f, BLACK, kFillModeSolid);
-		}
-		else if (i == kSegmentNum - 1) {
-			Novice::DrawEllipse(int(screenCatmull1.x), int(screenCatmull1.y), 3, 3, 0.0f, BLACK, kFillModeSolid);
-		}
-	}
 }
 
 bool IsCollideSphere(const Sphere& sphere1, const Sphere& sphere2)
