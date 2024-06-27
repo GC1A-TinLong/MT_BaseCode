@@ -108,6 +108,11 @@ struct ConicalPendulum {
 	float angularVelocity;
 };
 
+struct Capsule {
+	Segment segment;
+	float radius;
+};
+
 void CameraControl(char* keys, Vector3& cameraPosition, Vector3& cameraRotate);
 
 void VectorScreenPrintf(int x, int y, const Vector3& vector, const char* label);
