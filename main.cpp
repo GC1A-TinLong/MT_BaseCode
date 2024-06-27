@@ -70,7 +70,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		center.y = conicalPendulum.anchor.y - height;
 		center.z = conicalPendulum.anchor.z + std::sin(conicalPendulum.angle) * radius;
 
-		conicalPendulum.length = std::clamp(conicalPendulum.length, 0.1f, std::numeric_limits<float>::infinity());
+		conicalPendulum.length = std::clamp(conicalPendulum.length, 0.01f, std::numeric_limits<float>::infinity());
 		conicalPendulum.halfApexAngle = std::clamp(conicalPendulum.halfApexAngle, -1.57f, 1.57f);
 		if (start) {
 			StartConicalPendulumMotion(conicalPendulum, center);
