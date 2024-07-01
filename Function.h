@@ -199,7 +199,7 @@ template<int32_t N>
 inline void DrawHierarchy3points(const Vector3(&translates)[N], const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix)
 {
 	Vector3 screenTranslate[3]{};
-	for (int i = 0; i < 3; i++) {
+	for (int i = 0; i < N; i++) {
 		screenTranslate[i]= Transform(Transform(translates[i], viewProjectionMatrix), viewportMatrix);
 	}
 	DrawSphere({ translates[0],0.05f }, viewProjectionMatrix, viewportMatrix, RED);
