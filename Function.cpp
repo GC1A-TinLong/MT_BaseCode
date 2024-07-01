@@ -197,6 +197,14 @@ Vector3 Catmull(const Vector3& p0, const Vector3& p1, const Vector3& p2, const V
 	return result;
 }
 
+Vector3 Perpendicular(const Vector3& vector)
+{
+	if (vector.x != 0.0f || vector.y != 0.0f) {
+		return { -vector.y,vector.x,0.0f };
+	}
+	return { 0.0f,-vector.z,vector.y };
+}
+
 Matrix4x4 operator+(const Matrix4x4& m1, const Matrix4x4& m2)
 {
 	Matrix4x4 result{};
@@ -746,16 +754,6 @@ void DrawConicalPendulum(const ConicalPendulum& conicalPendulum, const Vector3& 
 	DrawSphere({ center,0.05f }, viewProjectionMatrix, viewportMatrix, color);
 }
 
-template <int32_t N>
-inline void Hierarchy3points(const Vector3(&translates)[N], const Vector3(&rotates)[N], const Vector3(&scales)[N]) 
-{
-	Matrix4x4 shoulderWorldMatrix = MakeAffineMatrix(scales[0], rotates[0], translates[0]);
-	Matrix4x4 elbowLocalMatrix = MakeAffineMatrix(scales[1], rotates[1], translates[1]);
-	Matrix4x4 elbowWorldMatrix = elbowLocalMatrix * shoulderWorldMatrix;
-	Matrix4x4 handLocalMatrix = MakeAffineMatrix(scales[2], rotates[2], translates[2]);
-	Matrix4x4 handWorldMatrix = handLocalMatrix * elbowWorldMatrix;
-}
-
 bool IsCollideSphere(const Sphere& sphere1, const Sphere& sphere2)
 {
 	float distance = Length(sphere2.center - sphere1.center);
@@ -763,14 +761,6 @@ bool IsCollideSphere(const Sphere& sphere1, const Sphere& sphere2)
 		return true;
 	}
 	return false;
-}
-
-Vector3 Perpendicular(const Vector3& vector)
-{
-	if (vector.x != 0.0f || vector.y != 0.0f) {
-		return { -vector.y,vector.x,0.0f };
-	}
-	return { 0.0f,-vector.z,vector.y };
 }
 
 bool IsCollideSpherePlane(const Sphere& sphere, const Plane& plane)
