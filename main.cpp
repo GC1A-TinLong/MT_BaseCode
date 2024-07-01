@@ -17,7 +17,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Vector3 cameraRotate{ 0.26f,0,0 };
 	Vector3 cameraPosition{ 0.0f,1.9f,-6.49f };
 
-	Vector3 controlPoints[4] = {
+	Vector3 controlPoints[4] = { 
 		{-0.8f,0.58f,1.0f},
 		{1.76f,1.0f,-0.3f},
 		{0.94f,-0.7f,2.3f},
