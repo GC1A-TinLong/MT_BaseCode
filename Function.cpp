@@ -772,7 +772,7 @@ bool IsCollideSpherePlane(const Sphere& sphere, const Plane& plane)
 	return false;
 }
 
-bool IsCollideLinePlane(const Segment& segment, const Plane& plane)
+bool IsCollideSegmentPlane(const Segment& segment, const Plane& plane)
 {
 	float dot = Dot(plane.normal, segment.diff);
 	if (dot == 0.0f) { return false; }	// when perpendicular -> never colliding
@@ -784,15 +784,22 @@ bool IsCollideLinePlane(const Segment& segment, const Plane& plane)
 	return false;
 }
 
-bool IsCollideTriangleLine(const Triangle& triangle, const Segment& segment)
+bool IsCollideTriangleSegment(const Triangle& triangle, const Segment& segment)
 {
-	// cross(vector1,vector2)↓
+	// cross(vector01,vector12)↓
 	Vector3 normal = Normalize(Cross((triangle.vertics[1] - triangle.vertics[0]), (triangle.vertics[2] - triangle.vertics[1])));
 	float dot = Dot(normal, segment.diff);
 	if (dot == 0.0f) { return false; }	// when perpendicular -> never colliding
+	/*
+	平面の方程式：n⋅(p − v0​) = 0		<- v0である必要はない、任意の既知の平面上の点でもいい
+	展開すると：n⋅p = n⋅v0
+	Segment上の点ｐ：p = o + tb
+	方程式に入れると：n⋅(o + tb) = n⋅v0
+	さらにｔを左に移動させると：o⋅n + tb⋅n = n⋅v0  ->  t = (n⋅v0 - o⋅n)/b⋅n		(plane.distance = a⋅n -> aは既知の点でこの場合v0/v1/v2)
+	*/
 	float t = (Dot(triangle.vertics[0], normal) - Dot(segment.origin, normal)) / dot;
 
-	Vector3 p = segment.origin + t * segment.diff;
+	Vector3 p = segment.origin + t * segment.diff;	// p = o + tb
 	Vector3 v01 = triangle.vertics[1] - triangle.vertics[0];
 	Vector3 v12 = triangle.vertics[2] - triangle.vertics[1];
 	Vector3 v20 = triangle.vertics[0] - triangle.vertics[2];

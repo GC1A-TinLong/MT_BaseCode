@@ -173,8 +173,8 @@ void DrawConicalPendulum(const ConicalPendulum& conicalPendulum, const Vector3& 
 bool IsCollideSphere(const Sphere& sphere1, const Sphere& sphere2);
 Vector3 Perpendicular(const Vector3& vector);
 bool IsCollideSpherePlane(const Sphere& sphere, const Plane& plane);
-bool IsCollideLinePlane(const Segment& segment, const Plane& plane);
-bool IsCollideTriangleLine(const Triangle& triangle, const Segment& segment);
+bool IsCollideSegmentPlane(const Segment& segment, const Plane& plane);
+bool IsCollideTriangleSegment(const Triangle& triangle, const Segment& segment);
 bool IsCollideAABB(const AABB& a, const AABB& b);
 bool IsCollideAABBSphere(const AABB& aabb, const Sphere& sphere);
 bool IsCollideAABBSegment(const AABB& aabb, const Segment& segment);
