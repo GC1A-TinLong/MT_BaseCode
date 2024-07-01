@@ -746,6 +746,16 @@ void DrawConicalPendulum(const ConicalPendulum& conicalPendulum, const Vector3& 
 	DrawSphere({ center,0.05f }, viewProjectionMatrix, viewportMatrix, color);
 }
 
+template <int32_t N>
+inline void Hierarchy3points(const Vector3(&translates)[N], const Vector3(&rotates)[N], const Vector3(&scales)[N]) 
+{
+	Matrix4x4 shoulderWorldMatrix = MakeAffineMatrix(scales[0], rotates[0], translates[0]);
+	Matrix4x4 elbowLocalMatrix = MakeAffineMatrix(scales[1], rotates[1], translates[1]);
+	Matrix4x4 elbowWorldMatrix = elbowLocalMatrix * shoulderWorldMatrix;
+	Matrix4x4 handLocalMatrix = MakeAffineMatrix(scales[2], rotates[2], translates[2]);
+	Matrix4x4 handWorldMatrix = handLocalMatrix * elbowWorldMatrix;
+}
+
 bool IsCollideSphere(const Sphere& sphere1, const Sphere& sphere2)
 {
 	float distance = Length(sphere2.center - sphere1.center);
