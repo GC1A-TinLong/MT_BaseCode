@@ -790,6 +790,7 @@ bool IsCollideTriangleSegment(const Triangle& triangle, const Segment& segment)
 	Vector3 normal = Normalize(Cross((triangle.vertics[1] - triangle.vertics[0]), (triangle.vertics[2] - triangle.vertics[1])));
 	float dot = Dot(normal, segment.diff);
 	if (dot == 0.0f) { return false; }	// when perpendicular -> never colliding
+	//if (dot < 1e-6) { return false; } -> 10^-6 (extremely small amount)
 	/*
 	平面の方程式：n⋅(p − v0​) = 0		<- v0である必要はない、任意の既知の平面上の点でもいい
 	展開すると：n⋅p = n⋅v0

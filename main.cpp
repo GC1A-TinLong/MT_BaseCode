@@ -66,7 +66,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		CameraControl(keys, cameraPosition, cameraRotate);
 
-		Hierarchy3points(scales, rotates, translates);
+		//Hierarchy3points(scales, rotates, translates);
 
 		///
 		/// ↑更新処理ここまで
@@ -78,7 +78,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		DrawGrid(viewProjectionMatrix, viewportMatrix);
 
-		DrawHierarchy3points(translates, viewProjectionMatrix, viewportMatrix);
+		DrawHierarchy3points(scales, rotates, translates, viewProjectionMatrix, viewportMatrix);
 
 		ImGui::Begin("Debug Window");
 		ImGui::DragFloat3("CameraTranslate", &cameraPosition.x, 0.01f);
