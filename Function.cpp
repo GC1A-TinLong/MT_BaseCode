@@ -197,6 +197,14 @@ Vector3 Catmull(const Vector3& p0, const Vector3& p1, const Vector3& p2, const V
 	return result;
 }
 
+Vector3 Perpendicular(const Vector3& vector)
+{
+	if (vector.x != 0.0f || vector.y != 0.0f) {
+		return { -vector.y,vector.x,0.0f };
+	}
+	return { 0.0f,-vector.z,vector.y };
+}
+
 Matrix4x4 operator+(const Matrix4x4& m1, const Matrix4x4& m2)
 {
 	Matrix4x4 result{};
@@ -755,14 +763,6 @@ bool IsCollideSphere(const Sphere& sphere1, const Sphere& sphere2)
 	return false;
 }
 
-Vector3 Perpendicular(const Vector3& vector)
-{
-	if (vector.x != 0.0f || vector.y != 0.0f) {
-		return { -vector.y,vector.x,0.0f };
-	}
-	return { 0.0f,-vector.z,vector.y };
-}
-
 bool IsCollideSpherePlane(const Sphere& sphere, const Plane& plane)
 {
 	float distance = (Dot(plane.normal, sphere.center) - plane.distance);
@@ -790,6 +790,7 @@ bool IsCollideTriangleSegment(const Triangle& triangle, const Segment& segment)
 	Vector3 normal = Normalize(Cross((triangle.vertics[1] - triangle.vertics[0]), (triangle.vertics[2] - triangle.vertics[1])));
 	float dot = Dot(normal, segment.diff);
 	if (dot == 0.0f) { return false; }	// when perpendicular -> never colliding
+	//if (dot < 1e-6) { return false; } -> 10^-6 (extremely small amount)
 	/*
 	平面の方程式：n⋅(p − v0​) = 0		<- v0である必要はない、任意の既知の平面上の点でもいい
 	展開すると：n⋅p = n⋅v0
