@@ -751,9 +751,9 @@ void DrawConicalPendulum(const ConicalPendulum& conicalPendulum, const Vector3& 
 	DrawSphere({ center,0.05f }, viewProjectionMatrix, viewportMatrix, color);
 }
 
-void StartReflection(const Plane& plane, Ball& ball, const Capsule& capsule)
+void StartReflection(const Plane& plane, Ball& ball, Capsule& capsule)
 {
-	const float e_ = 0.8f;	// Coefficient of restitution
+	const float e_ = 0.5f;	// Coefficient of restitution
 
 	ball.velocity += ball.accerleration * deltaTime;
 	ball.position += ball.velocity * deltaTime;
@@ -771,6 +771,9 @@ void StartReflection(const Plane& plane, Ball& ball, const Capsule& capsule)
 
 		float t = Dot(d, e) / Length(capsule.segment.diff);
 		t = std::clamp(t, 0.0f, 1.0f);
+		capsule.segment.origin = ball.position;
+		capsule.segment.diff = ball.velocity;
+
 		Vector3 f = (1.0f - t) * capsule.segment.origin + t + capsule.segment.diff;
 		Vector3 penetrationDepth = f - ball.position;
 

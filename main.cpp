@@ -32,7 +32,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	Capsule capsule{
 		.segment{{0,0,0},{1.0f,1.0f,1.0f}},
-		.radius = 0.05f,
+		.radius = 0.01f,
 	};
 
 	bool start = false;
