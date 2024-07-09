@@ -175,12 +175,12 @@ void StartPendulumMotion(Pendulum& pendulum, Vector3& center);
 void DrawPendulum(const Pendulum& pendulum, const Vector3& center, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
 void StartConicalPendulumMotion(ConicalPendulum& conicalPendulum, Vector3& center);
 void DrawConicalPendulum(const ConicalPendulum& conicalPendulum, const Vector3& center, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
-void StartReflection(const Plane& plane, Ball& ball, Capsule& capsule);
+void StartReflection(const Plane& plane, Ball& ball);
 
 bool IsCollideSphere(const Sphere& sphere1, const Sphere& sphere2);
 Vector3 Perpendicular(const Vector3& vector);
 bool IsCollideSpherePlane(const Sphere& sphere, const Plane& plane);
-bool IsCollideLinePlane(const Segment& segment, const Plane& plane);
+bool IsCollideSegmentPlane(const Segment& segment, const Plane& plane);
 bool IsCollideTriangleLine(const Triangle& triangle, const Segment& segment);
 bool IsCollideAABB(const AABB& a, const AABB& b);
 bool IsCollideAABBSphere(const AABB& aabb, const Sphere& sphere);

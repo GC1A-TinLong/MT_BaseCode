@@ -751,7 +751,7 @@ void DrawConicalPendulum(const ConicalPendulum& conicalPendulum, const Vector3& 
 	DrawSphere({ center,0.05f }, viewProjectionMatrix, viewportMatrix, color);
 }
 
-void StartReflection(const Plane& plane, Ball& ball, Capsule& capsule)
+void StartReflection(const Plane& plane, Ball& ball)
 {
 	const float e_ = 0.5f;	// Coefficient of restitution
 
@@ -765,7 +765,12 @@ void StartReflection(const Plane& plane, Ball& ball, Capsule& capsule)
 		ball.velocity = projectToNormal * e_ + movingDirection;
 	}
 
-	if (IsCollideCapsuleSphere(capsule, { ball.position,ball.radius })) {
+	/*Segment ballSegmentToPlane = { {ball.position},{ball.velocity} };
+	if (IsCollideSegmentPlane(ballSegmentToPlane, plane)) {
+		ball.position += plane.normal;
+	}*/
+
+	/*if (IsCollideCapsuleSphere(capsule, { ball.position,ball.radius })) {
 		Vector3 d = ball.position - capsule.segment.origin;
 		Vector3 e = Normalize(capsule.segment.diff);
 
@@ -778,7 +783,7 @@ void StartReflection(const Plane& plane, Ball& ball, Capsule& capsule)
 		Vector3 penetrationDepth = f - ball.position;
 
 		ball.position += Normalize(penetrationDepth) * (capsule.radius + ball.radius - Length(penetrationDepth));
-	}
+	}*/
 }
 
 bool IsCollideSphere(const Sphere& sphere1, const Sphere& sphere2)
@@ -807,7 +812,7 @@ bool IsCollideSpherePlane(const Sphere& sphere, const Plane& plane)
 	return false;
 }
 
-bool IsCollideLinePlane(const Segment& segment, const Plane& plane)
+bool IsCollideSegmentPlane(const Segment& segment, const Plane& plane)
 {
 	float dot = Dot(plane.normal, segment.diff);
 	if (dot == 0.0f) { return false; }	// when perpendicular -> never colliding
