@@ -185,6 +185,11 @@ Vector3 Bezier(const Vector3& p0, const Vector3& p1, const Vector3& p2, float t)
 	return Lerp(p0p1, p1p2, t);
 }
 
+Vector3 ReflectVector(const Vector3& input, const Vector3& normal)
+{
+	return input - 2.0f * Dot(input, normal) * normal;
+}
+
 Vector3 Catmull(const Vector3& p0, const Vector3& p1, const Vector3& p2, const Vector3& p3, float t)
 {
 	Vector3 result{};
@@ -195,14 +200,6 @@ Vector3 Catmull(const Vector3& p0, const Vector3& p1, const Vector3& p2, const V
 	result.z = 0.5f * ((-p0.z + 3 * p1.z - 3 * p2.z + p3.z) * powf(t, 3.0f) + (2 * p0.z - 5 * p1.z + 4 * p2.z - p3.z) * powf(t, 2.0f) +
 		(-p0.z + p2.z) * t + (2 * p1.z));
 	return result;
-}
-
-Vector3 Perpendicular(const Vector3& vector)
-{
-	if (vector.x != 0.0f || vector.y != 0.0f) {
-		return { -vector.y,vector.x,0.0f };
-	}
-	return { 0.0f,-vector.z,vector.y };
 }
 
 Matrix4x4 operator+(const Matrix4x4& m1, const Matrix4x4& m2)
@@ -754,6 +751,41 @@ void DrawConicalPendulum(const ConicalPendulum& conicalPendulum, const Vector3& 
 	DrawSphere({ center,0.05f }, viewProjectionMatrix, viewportMatrix, color);
 }
 
+void StartReflection(const Plane& plane, Ball& ball)
+{
+	const float e_ = 0.5f;	// Coefficient of restitution
+
+	ball.velocity += ball.accerleration * deltaTime;
+	ball.position += ball.velocity * deltaTime;
+
+	if (IsCollideSpherePlane(Sphere{ ball.position,ball.radius }, plane)) {
+		Vector3 reflected = ReflectVector(ball.velocity, plane.normal);
+		Vector3 projectToNormal = Project(reflected, plane.normal);
+		Vector3 movingDirection = reflected - projectToNormal;
+		ball.velocity = projectToNormal * e_ + movingDirection;
+	}
+
+	/*Segment ballSegmentToPlane = { {ball.position},{ball.velocity} };
+	if (IsCollideSegmentPlane(ballSegmentToPlane, plane)) {
+		ball.position += plane.normal;
+	}*/
+
+	/*if (IsCollideCapsuleSphere(capsule, { ball.position,ball.radius })) {
+		Vector3 d = ball.position - capsule.segment.origin;
+		Vector3 e = Normalize(capsule.segment.diff);
+
+		float t = Dot(d, e) / Length(capsule.segment.diff);
+		t = std::clamp(t, 0.0f, 1.0f);
+		capsule.segment.origin = ball.position;
+		capsule.segment.diff = ball.velocity;
+
+		Vector3 f = (1.0f - t) * capsule.segment.origin + t + capsule.segment.diff;
+		Vector3 penetrationDepth = f - ball.position;
+
+		ball.position += Normalize(penetrationDepth) * (capsule.radius + ball.radius - Length(penetrationDepth));
+	}*/
+}
+
 bool IsCollideSphere(const Sphere& sphere1, const Sphere& sphere2)
 {
 	float distance = Length(sphere2.center - sphere1.center);
@@ -761,6 +793,14 @@ bool IsCollideSphere(const Sphere& sphere1, const Sphere& sphere2)
 		return true;
 	}
 	return false;
+}
+
+Vector3 Perpendicular(const Vector3& vector)
+{
+	if (vector.x != 0.0f || vector.y != 0.0f) {
+		return { -vector.y,vector.x,0.0f };
+	}
+	return { 0.0f,-vector.z,vector.y };
 }
 
 bool IsCollideSpherePlane(const Sphere& sphere, const Plane& plane)
@@ -784,23 +824,15 @@ bool IsCollideSegmentPlane(const Segment& segment, const Plane& plane)
 	return false;
 }
 
-bool IsCollideTriangleSegment(const Triangle& triangle, const Segment& segment)
+bool IsCollideTriangleLine(const Triangle& triangle, const Segment& segment)
 {
-	// cross(vector01,vector12)↓
+	// cross(vector1,vector2)↓
 	Vector3 normal = Normalize(Cross((triangle.vertics[1] - triangle.vertics[0]), (triangle.vertics[2] - triangle.vertics[1])));
 	float dot = Dot(normal, segment.diff);
 	if (dot == 0.0f) { return false; }	// when perpendicular -> never colliding
-	//if (dot < 1e-6) { return false; } -> 10^-6 (extremely small amount)
-	/*
-	平面の方程式：n⋅(p − v0​) = 0		<- v0である必要はない、任意の既知の平面上の点でもいい
-	展開すると：n⋅p = n⋅v0
-	Segment上の点ｐ：p = o + tb
-	方程式に入れると：n⋅(o + tb) = n⋅v0
-	さらにｔを左に移動させると：o⋅n + tb⋅n = n⋅v0  ->  t = (n⋅v0 - o⋅n)/b⋅n		(plane.distance = a⋅n -> aは既知の点でこの場合v0/v1/v2)
-	*/
 	float t = (Dot(triangle.vertics[0], normal) - Dot(segment.origin, normal)) / dot;
 
-	Vector3 p = segment.origin + t * segment.diff;	// p = o + tb
+	Vector3 p = segment.origin + t * segment.diff;
 	Vector3 v01 = triangle.vertics[1] - triangle.vertics[0];
 	Vector3 v12 = triangle.vertics[2] - triangle.vertics[1];
 	Vector3 v20 = triangle.vertics[0] - triangle.vertics[2];
@@ -928,4 +960,18 @@ bool IsCollideOBBSphere(OBB& obb, const Sphere& sphere, Matrix4x4& rotateMatrix)
 	};
 
 	return IsCollideAABBSphere(aabbObbLocal, sphereObbLocal);
+}
+
+bool IsCollideCapsuleSphere(const Capsule& capsule, const Sphere& sphere)
+{
+	Vector3 d = sphere.center - capsule.segment.origin;
+	Vector3 e = Normalize(capsule.segment.diff);
+
+	float t = Dot(d, e) / Length(capsule.segment.diff);
+	t = std::clamp(t, 0.0f, 1.0f);
+
+	Vector3 f = (1.0f - t) * capsule.segment.origin + t * capsule.segment.diff;
+	float distance = Length(sphere.center - f);
+
+	return distance <= sphere.radius + capsule.radius;
 }
