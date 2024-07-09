@@ -24,7 +24,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	CircularPoint circularPoint{
 		.p{0.0f,0.0f,0.0f},
 		.angle = 0.0f,
-		.radiusFromCenter = 1.0f,
+		.radiusFromCenter = 2.0f,
 		.start = false,
 	};
 
