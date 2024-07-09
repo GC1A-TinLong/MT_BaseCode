@@ -176,6 +176,8 @@ void DrawPendulum(const Pendulum& pendulum, const Vector3& center, const Matrix4
 void StartConicalPendulumMotion(ConicalPendulum& conicalPendulum, Vector3& center);
 void DrawConicalPendulum(const ConicalPendulum& conicalPendulum, const Vector3& center, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
 void StartReflection(const Plane& plane, Ball& ball);
+template <int32_t N>
+void DrawHierarchy3points(const Vector3(&scales)[N], const Vector3(&rotates)[N], const Vector3(&translates)[N], const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix);
 
 bool IsCollideSphere(const Sphere& sphere1, const Sphere& sphere2);
 Vector3 Perpendicular(const Vector3& vector);
@@ -187,3 +189,26 @@ bool IsCollideAABBSphere(const AABB& aabb, const Sphere& sphere);
 bool IsCollideAABBSegment(const AABB& aabb, const Segment& segment);
 bool IsCollideOBBSphere(OBB& obb, const Sphere& sphere, Matrix4x4& rotateMatrix);
 bool IsCollideCapsuleSphere(const Capsule& capsule, const Sphere& sphere);
+
+template<int32_t N>
+inline void DrawHierarchy3points(const Vector3(&scales)[N], const Vector3(&rotates)[N], const Vector3(&translates)[N], const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix)
+{
+	Matrix4x4 shoulderWorldMatrix = MakeAffineMatrix(scales[0], rotates[0], translates[0]);
+	Matrix4x4 elbowLocalMatrix = MakeAffineMatrix(scales[1], rotates[1], translates[1]);
+	Matrix4x4 elbowWorldMatrix = elbowLocalMatrix * shoulderWorldMatrix;
+	Matrix4x4 handLocalMatrix = MakeAffineMatrix(scales[2], rotates[2], translates[2]);
+	Matrix4x4 handWorldMatrix = handLocalMatrix * elbowWorldMatrix;
+
+	Vector3 shoulderWorldPos = { shoulderWorldMatrix.m[3][0], shoulderWorldMatrix.m[3][1], shoulderWorldMatrix.m[3][2] };
+	Vector3 elbowWorldPos = { elbowWorldMatrix.m[3][0], elbowWorldMatrix.m[3][1], elbowWorldMatrix.m[3][2] };
+	Vector3 handWorldPos = { handWorldMatrix.m[3][0], handWorldMatrix.m[3][1], handWorldMatrix.m[3][2] };
+	Vector3 screenShoulder = Transform(Transform(shoulderWorldPos, viewProjectionMatrix), viewportMatrix);
+	Vector3 screenElbow = Transform(Transform(elbowWorldPos, viewProjectionMatrix), viewportMatrix);
+	Vector3 screenHand = Transform(Transform(handWorldPos, viewProjectionMatrix), viewportMatrix);
+
+	DrawSphere({ shoulderWorldPos,0.05f }, viewProjectionMatrix, viewportMatrix, RED);
+	DrawSphere({ elbowWorldPos,0.05f }, viewProjectionMatrix, viewportMatrix, GREEN);
+	DrawSphere({ handWorldPos,0.05f }, viewProjectionMatrix, viewportMatrix, BLUE);
+	Novice::DrawLine(int(screenShoulder.x), int(screenShoulder.y), int(screenElbow.x), int(screenElbow.y), WHITE);
+	Novice::DrawLine(int(screenElbow.x), int(screenElbow.y), int(screenHand.x), int(screenHand.y), WHITE);
+}
