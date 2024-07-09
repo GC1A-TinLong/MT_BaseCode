@@ -172,8 +172,6 @@ void DrawPendulum(const Pendulum& pendulum, const Vector3& center, const Matrix4
 void StartConicalPendulumMotion(ConicalPendulum& conicalPendulum, Vector3& center);
 void DrawConicalPendulum(const ConicalPendulum& conicalPendulum, const Vector3& center, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
 template <int32_t N>
-void Hierarchy3points(const Vector3(&scales)[N], const Vector3(&rotates)[N], const Vector3(&translates)[N]);
-template <int32_t N>
 void DrawHierarchy3points(const Vector3(&scales)[N], const Vector3(&rotates)[N], const Vector3(&translates)[N], const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix);
 
 bool IsCollideSphere(const Sphere& sphere1, const Sphere& sphere2);
@@ -184,17 +182,6 @@ bool IsCollideAABB(const AABB& a, const AABB& b);
 bool IsCollideAABBSphere(const AABB& aabb, const Sphere& sphere);
 bool IsCollideAABBSegment(const AABB& aabb, const Segment& segment);
 bool IsCollideOBBSphere(OBB& obb, const Sphere& sphere, Matrix4x4& rotateMatrix);
-
-template<int32_t N>
-inline void Hierarchy3points(const Vector3(&scales)[N], const Vector3(&rotates)[N], const Vector3(&translates)[N])
-{
-	Matrix4x4 shoulderWorldMatrix = MakeAffineMatrix(scales[0], rotates[0], translates[0]);
-	Matrix4x4 elbowLocalMatrix = MakeAffineMatrix(scales[1], rotates[1], translates[1]);
-	Matrix4x4 elbowWorldMatrix = elbowLocalMatrix * shoulderWorldMatrix;
-	Matrix4x4 handLocalMatrix = MakeAffineMatrix(scales[2], rotates[2], translates[2]);
-	Matrix4x4 handWorldMatrix = handLocalMatrix * elbowWorldMatrix;
-}
-
 template<int32_t N>
 inline void DrawHierarchy3points(const Vector3(&scales)[N], const Vector3(&rotates)[N], const Vector3(&translates)[N], const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix)
 {
