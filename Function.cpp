@@ -33,6 +33,71 @@ void CameraControl(char* keys, Vector3& cameraPosition, Vector3& cameraRotate) {
 	}
 }
 
+void MouseCameraControl(Camera& camera)
+{
+	int32_t wheel = Novice::GetWheel();
+
+	camera.shperical.radius -= (wheel / 512.0f);
+	camera.shperical.radius = (std::max)(camera.shperical.radius, 0.1f);
+
+	if (!Novice::CheckHitKey(DIK_LALT)) {
+		camera.capture.button = -1;
+		return;
+	}
+	int mouseX, mouseY;
+	if (!Novice::GetMousePosition(&mouseX, &mouseY)) {
+		assert(false);
+		return;
+	}
+
+	if (camera.capture.button == -1) {
+		if (Novice::IsPressMouse(0)) {
+			camera.capture.button = 0;
+		}
+		else if (Novice::IsPressMouse(1)) {
+			camera.capture.button = 1;
+		}
+		else if (Novice::IsPressMouse(2)) {
+			camera.capture.button = 2;
+		}
+
+		if (camera.capture.button != -1) {
+			camera.capture.mouse.x = float(mouseX);
+			camera.capture.mouse.y = float(mouseY);
+			camera.capture.spherical = camera.shperical;
+			camera.capture.center = camera.center;
+		}
+	}
+	else {
+		if (Novice::IsPressMouse(camera.capture.button)) {
+			Vector2 mouse = { float(mouseX),float(mouseY) };
+			Vector2 diff = camera.capture.mouse - mouse;
+
+			if (camera.capture.button == 0) {
+				camera.shperical.theta = camera.capture.spherical.theta + (-diff.y / 360.0f);
+				camera.shperical.phi = camera.capture.spherical.phi + (diff.x / 320.0f);
+			}
+			else if (camera.capture.button == 1) {
+				camera.shperical.radius = camera.capture.spherical.radius + ((diff.x - diff.y) / 100.0f);
+				camera.shperical.radius = (std::max)(camera.shperical.radius, 0.1f);
+			}
+			else if (camera.capture.button == 2) {
+				Matrix4x4 rotateMatrix = MakeRotateXMatrix(camera.capture.spherical.theta) * MakeRotateYMatrix(-camera.capture.spherical.phi);
+				Vector3 axisX = { 1.0f,0,0 };
+				Vector3 axisY = { 0,1.0f,0 };
+				Vector3 moveX = Transform(axisX, rotateMatrix);
+				Vector3 moveY = Transform(axisY, rotateMatrix);
+
+				Vector3 move = ((diff.x / 320.0f) * moveX) + ((-diff.y / 360.0f) * moveY);
+				camera.center = camera.capture.center + move;
+			}
+		}
+		else {
+			camera.capture.button = -1;
+		}
+	}
+}
+
 void VectorScreenPrintf(int x, int y, const Vector3& vector, const char* label) {
 	Novice::ScreenPrintf(x, y, "%0.2f", vector.x);
 	Novice::ScreenPrintf(x + kColumnWidth, y, "%0.2f", vector.y);
@@ -70,6 +135,14 @@ Vector2 Normalize(const Vector2Int& v)
 		v.x / Length(v),
 		v.y / Length(v),
 	};
+}
+
+Vector2 operator-(const Vector2& v1, const Vector2& v2)
+{
+	Vector2 result{};
+	result.x = v1.x - v2.x;
+	result.y = v1.y - v2.y;
+	return result;
 }
 
 Vector3 operator+(const Vector3& v)

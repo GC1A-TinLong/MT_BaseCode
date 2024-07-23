@@ -7,6 +7,7 @@
 #include <iostream>
 #include <imgui.h>
 #include <algorithm>
+#include "CameraUIControl.h"
 
 static const int kRowHeight = 20;
 static const int kColumnWidth = 60;
@@ -30,6 +31,25 @@ struct Vector3 {
 
 struct Matrix4x4 {
 	float m[4][4];
+};
+
+struct Spherical {
+	float theta;
+	float phi;
+	float radius;
+};
+
+struct Capture {
+	Spherical spherical;
+	int button;
+	Vector3 center;
+	Vector2 mouse;
+};
+
+struct Camera {
+	Spherical shperical;
+	Capture capture;
+	Vector3 center;
 };
 
 struct Sphere {
@@ -114,6 +134,7 @@ struct Capsule {
 };
 
 void CameraControl(char* keys, Vector3& cameraPosition, Vector3& cameraRotate);
+void MouseCameraControl(Camera& camera);
 
 void VectorScreenPrintf(int x, int y, const Vector3& vector, const char* label);
 void MatrixScreenPrintf(int x, int y, const Matrix4x4& matrix, const char* label);
@@ -121,6 +142,8 @@ void MatrixScreenPrintf(int x, int y, const Matrix4x4& matrix, const char* label
 Vector2Int operator-(const Vector2Int& v1, const Vector2Int& v2);
 float Length(const Vector2Int& v);
 Vector2 Normalize(const Vector2Int& v);
+
+Vector2 operator-(const Vector2& v1, const Vector2& v2);
 
 Vector3 operator+(const Vector3& v);
 Vector3 operator-(const Vector3& v);
